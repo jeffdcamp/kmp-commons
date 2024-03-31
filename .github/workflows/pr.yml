@@ -25,13 +25,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew clean build assembleAlpha
+        run: ./gradlew clean build
 
       - name: Test
         run: ./gradlew test
 
       - name: Lint
-        run: ./gradlew lintDebug
+        run: ./gradlew lint
 
       - name: Detekt
         run: ./gradlew detekt
