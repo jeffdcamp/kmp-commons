@@ -9,7 +9,7 @@ package org.dbtools.kmp.commons.network
  * https://github.com/skydoves/sandwich
  */
 
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

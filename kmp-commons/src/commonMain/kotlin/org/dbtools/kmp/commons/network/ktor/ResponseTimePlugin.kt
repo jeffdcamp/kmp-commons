@@ -2,8 +2,8 @@
 
 package org.dbtools.kmp.commons.network.ktor
 
-import io.ktor.client.plugins.api.*
-import io.ktor.client.statement.*
+import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.statement.request
 
 val ResponseTimePlugin = createClientPlugin("ResponseTimePlugin") {
     onResponse { response ->
