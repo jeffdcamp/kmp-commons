@@ -48,7 +48,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
 //                implementation(libs.ktor.client.auth)
 //                implementation(libs.ktor.client.contentNegotiation)
-//                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.logging)
 //                implementation(libs.ktor.client.resources)
 //                implementation(libs.ktor.serialization.json)
 
@@ -67,11 +67,19 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlin.coroutines.test)
                 implementation(libs.assertK)
+
+                implementation(libs.kotlin.coroutines.test)
+                implementation(libs.ktor.client.mock)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.serialization)
+                implementation(libs.ktor.client.resources)
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation(libs.ktor.client.okhttp)
+//                implementation(libs.ktor.client.okhttp)
             }
         }
         val androidUnitTest by getting {
@@ -82,7 +90,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation(libs.ktor.client.darwin)
+//                implementation(libs.ktor.client.darwin)
             }
         }
     }
@@ -96,7 +104,7 @@ kotlin {
 
 android {
     namespace = "com.dbtools.kmp.commons"
-    compileSdk = LibInfo.AndroidSdk.COMPILE
+    compileSdk = 34
     defaultConfig {
         minSdk = LibInfo.AndroidSdk.MIN
     }
@@ -122,7 +130,6 @@ android {
         compileOnly(libs.google.firebase.config)
         compileOnly(libs.google.firebase.crashlytics)
         compileOnly(libs.google.firebase.firestore)
-
     }
 }
 
@@ -147,19 +154,24 @@ kmmbridge {
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
-koverReport {
-    defaults {
-        // adds the contents of the reports of `release` Android build variant to default reports
-        mergeWith("release")
+kover {
+    currentProject {
+        createVariant("lib") {
+            // adds the contents of the reports of `release` Android build variant to default reports
+            addWithDependencies("release")
+        }
     }
 
-    verify {
-        rule {
-            minBound(0)
+    reports {
+        verify {
+            rule {
+                minBound(0)
+            }
         }
     }
 }
 
+// ./gradlew clean build assembleRelease publishToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
 publishing {

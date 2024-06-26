@@ -1,35 +1,32 @@
 [versions]
-agp = "8.3.1"
-kotlin = "1.9.23"
-kotlinxCoroutines = "1.8.0"
-kotlinxSerialization = "1.6.3"
-kotlinxDateTime = "0.6.0-RC.2"
+agp = "8.2.0"
+kotlin = "2.0.0"
+kotlinxCoroutines = "1.9.0-RC"
+kotlinxSerialization = "1.7.1"
+kotlinxDateTime = "0.6.0"
 
-androidxActivity = "1.8.2"
-androidxDataStore = "1.1.0-beta02"
-androidxLifecycle = "2.7.0"
+androidxActivity = "1.9.0"
+androidxDataStore = "1.1.1"
+androidxLifecycle = "2.8.2"
 androidxRoom = "2.6.1"
 
-assertK = "0.28.0"
+assertK = "0.28.1"
 desugar = "2.0.4"
 detekt = "1.23.6"
 downloadPlugin = "5.6.0"
-firebaseAnalytics = "21.6.1"
-firebaseAuth = "22.3.1"
-firebaseConfig = "21.6.3"
-firebaseCrashlytics = "18.6.3"
-firebaseFirestore = "24.11.0"
-kermit = "2.0.3"
-kmmbridge = "0.5.2"
-kover = "0.7.6"
-ksp = "1.9.23-1.0.19"
-ktor = "3.0.0-beta-1"
-material = "1.11.0"
+firebaseAnalytics = "22.0.2"
+firebaseAuth = "23.0.0"
+firebaseConfig = "22.0.0"
+firebaseCrashlytics = "19.0.2"
+firebaseFirestore = "25.0.0"
+kermit = "2.0.4"
+kmmbridge = "0.5.5"
+kover = "0.8.1"
+ktor = "2.3.11"
 okio = "3.9.0"
-skie = "0.6.2"
+skie = "0.8.2"
 stately = "2.0.6"
 versionsPlugin = "0.51.0"
-datastoreCore = "1.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -43,7 +40,6 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
 
@@ -69,17 +65,14 @@ kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
-ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
@@ -87,6 +80,5 @@ touchlab-skie-annotations = { module = "co.touchlab.skie:configuration-annotatio
 touchlab-stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately"}
 
 assertK = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertK" }
-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 
 [bundles]
