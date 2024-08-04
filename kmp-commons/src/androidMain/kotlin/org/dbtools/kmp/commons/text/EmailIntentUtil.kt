@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.text.Html
 
-
 object EmailIntentUtil {
     fun getSendEmailIntent(
         recipient: String,

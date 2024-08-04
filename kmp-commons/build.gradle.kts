@@ -60,6 +60,8 @@ kotlin {
 
                 implementation(libs.touchlab.skie.annotations)
 //                implementation(libs.touchlab.stately.concurrency)
+
+                compileOnly(libs.androidx.room.common)
             }
         }
         val commonTest by getting {
@@ -79,7 +81,16 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-//                implementation(libs.ktor.client.okhttp)
+                // androidx
+                compileOnly(libs.androidx.lifecycle.process)
+                compileOnly(libs.androidx.activity)
+
+                // Firebase
+                compileOnly(libs.google.firebase.analytics)
+                compileOnly(libs.google.firebase.auth)
+                compileOnly(libs.google.firebase.config)
+                compileOnly(libs.google.firebase.crashlytics)
+                compileOnly(libs.google.firebase.firestore)
             }
         }
         val androidUnitTest by getting {
@@ -113,23 +124,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
-
-    dependencies {
-        coreLibraryDesugaring(libs.android.desugar)
-
-        // androidx
-        compileOnly(libs.androidx.lifecycle.process)
-        compileOnly(libs.androidx.activity)
-        compileOnly(libs.androidx.room.common)
-
-        // Firebase
-        compileOnly(libs.google.firebase.analytics)
-        compileOnly(libs.google.firebase.auth)
-        compileOnly(libs.google.firebase.config)
-        compileOnly(libs.google.firebase.crashlytics)
-        compileOnly(libs.google.firebase.firestore)
     }
 }
 
