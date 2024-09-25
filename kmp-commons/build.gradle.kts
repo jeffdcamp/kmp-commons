@@ -21,8 +21,8 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.set(
             listOf(
-                "-Xopt-in=kotlin.uuid.ExperimentalUuidApi",
-                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlin.uuid.ExperimentalUuidApi",
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             )
         )
     }
