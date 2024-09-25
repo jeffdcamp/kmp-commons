@@ -1,4 +1,4 @@
-package org.dbtools.kmp.commons.network
+package org.dbtools.kmp.commons.network.ktor
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo

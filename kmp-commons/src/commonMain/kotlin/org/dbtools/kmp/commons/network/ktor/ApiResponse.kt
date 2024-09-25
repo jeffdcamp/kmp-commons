@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package org.dbtools.kmp.commons.network
+package org.dbtools.kmp.commons.network.ktor
 
 /**
  * ApiResponse for network calls

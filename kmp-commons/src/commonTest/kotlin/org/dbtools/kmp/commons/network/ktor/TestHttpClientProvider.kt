@@ -1,4 +1,4 @@
-package org.dbtools.kmp.commons.network
+package org.dbtools.kmp.commons.network.ktor
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -8,7 +8,6 @@ import io.ktor.client.plugins.resources.Resources
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.dbtools.kmp.commons.log.KtorKermitLogger
-import org.dbtools.kmp.commons.network.ktor.ResponseTimePlugin
 
 object TestHttpClientProvider {
     fun getTestClient(

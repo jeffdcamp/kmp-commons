@@ -7,20 +7,30 @@ Helpers for
 
 * Analytics
 * Datastore
+* Room kotlin-datetime converters
+* Ktor
+    * DirectDownloader
+    * ApiResponse
+    * CacheApiResponse
 * Function extensions for
-    * Context
     * Enum
+    * KotlinDateTime
+    * Ktor
+    * Okio
     * Flow
     * Map
-    * SavedStateHandle
-* Firebase
-    * Firestore
-    * Remote Config
 * Logging
-* Networking
+* Text
+    * Csv Export
+    * EmailUtil
+    * NumberFormatExt
 
 ## Publishing Locally
-Edit `kmp-commons/gradle.properties` and add a fourth portion to the version (X.X.X.X)
+
+#### Publish Android, Jvm, Linux
+```shell
+./gradlew clean build assembleRelease publishToMavenLocal
+```
 
 #### Android
 ```shell
@@ -42,6 +52,11 @@ Run Tests
 ./gradlew clean tRUT iSAT
 ```
 
+#### Publish ALL
+```shell
+./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
+```
+
 #### Publish iOS
 ```shell
 ./gradlew kmp-commons:kmmBridgePublish -PENABLE_PUBLISHING=true
@@ -55,6 +70,7 @@ Run Tests
 ```shell
 ./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
 ```
+
 License
 =======
 

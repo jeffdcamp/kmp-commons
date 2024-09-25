@@ -26,8 +26,8 @@ import okio.FileSystem
 import okio.Path
 import okio.buffer
 import okio.use
-import org.dbtools.kmp.commons.network.ApiResponse
-import org.dbtools.kmp.commons.network.CacheApiResponse
+import org.dbtools.kmp.commons.network.ktor.ApiResponse
+import org.dbtools.kmp.commons.network.ktor.CacheApiResponse
 
 @Suppress("kotlin:S6312") // Sonar issue with Coroutine scope on function ext
 suspend fun <T, E> HttpClient.executeSafely(
