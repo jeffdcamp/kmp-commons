@@ -8,17 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Updated versions
+
+- Added support for jvm
 
 ### Changed
-- Changed Room dependency to 2.7.0-alpha05 (KMP supported version of Room)
+
+- Updated versions
 
 ### Removed
+
+- Removed Android specific dependency (focus this library on pure KMP common code)
 - Removed SavedStateHandleExt.kt (Use Typesafe navigation instead)
 - Removed JvmMapExt.kt (Use kotlin-datetime instead)
 
-## [1.0.0-alpha01] - 2024-03-30
+## [0.0.1] - 2024-03-30
 
 ### Added
+
 - Initial commit (copied/converted to kmp project from https://github.com/jeffdcamp/android-commons)
 

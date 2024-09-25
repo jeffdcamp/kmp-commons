@@ -1,7 +1,13 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.automicfu)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.skie)
     alias(libs.plugins.kmmbridge)
     alias(libs.plugins.kover)
@@ -9,25 +15,40 @@ plugins {
     id("maven-publish")
 }
 
-@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    androidTarget {
-
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        publishLibraryVariants("release")
+    compilerOptions {
+        freeCompilerArgs.set(
+            listOf(
+                "-Xopt-in=kotlin.uuid.ExperimentalUuidApi",
+                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            )
+        )
     }
 
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+        publishAllLibraryVariants()
+    }
+
+    jvm()
+
+    linuxX64()
+
+//    js {
+//        browser()
+//        nodejs()
+//    }
+
+    // Mac / iOS
     listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
-//        macosX64(),
+        macosX64(),
 //        macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -37,6 +58,29 @@ kotlin {
         }
     }
 
+    // ==== currently unsupported ====
+//    macosArm64()
+//    iosX64()
+//    iosArm64()
+//    iosSimulatorArm64()
+//    watchosArm32()
+//    watchosArm64()
+//    watchosSimulatorArm64()
+//    watchosDeviceArm64()
+//    watchosX64()
+//    tvosArm64()
+//    tvosSimulatorArm64()
+//    tvosX64()
+
+//    mingwX64()
+//    linuxArm64()
+
+//    androidNativeArm32()
+//    androidNativeArm64()
+//    androidNativeX86()
+//    androidNativeX64()
+
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -44,23 +88,12 @@ kotlin {
                 implementation(libs.kotlin.coroutines.core)
                 implementation(libs.kotlin.serialization.json)
                 implementation(libs.kotlin.datetime)
-
                 implementation(libs.ktor.client.core)
-//                implementation(libs.ktor.client.auth)
-//                implementation(libs.ktor.client.contentNegotiation)
                 implementation(libs.ktor.client.logging)
-//                implementation(libs.ktor.client.resources)
-//                implementation(libs.ktor.serialization.json)
-
                 implementation(libs.okio)
-
                 implementation(libs.androidx.datastore.preferences)
-
                 implementation(libs.kermit)
-
                 implementation(libs.touchlab.skie.annotations)
-//                implementation(libs.touchlab.stately.concurrency)
-
                 compileOnly(libs.androidx.room.common)
             }
         }
@@ -79,37 +112,6 @@ kotlin {
                 implementation(libs.ktor.client.resources)
             }
         }
-        val androidMain by getting {
-            dependencies {
-                // androidx
-                compileOnly(libs.androidx.lifecycle.process)
-                compileOnly(libs.androidx.activity)
-
-                // Firebase
-                compileOnly(libs.google.firebase.analytics)
-                compileOnly(libs.google.firebase.auth)
-                compileOnly(libs.google.firebase.config)
-                compileOnly(libs.google.firebase.crashlytics)
-                compileOnly(libs.google.firebase.firestore)
-            }
-        }
-        val androidUnitTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.kotlin.coroutines.test)
-            }
-        }
-        val iosMain by getting {
-            dependencies {
-//                implementation(libs.ktor.client.darwin)
-            }
-        }
-    }
-}
-
-kotlin {
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
-        compilations["main"].kotlinOptions.freeCompilerArgs += "-Xexport-kdoc"
     }
 }
 
@@ -139,12 +141,12 @@ skie {
 
 // ./gradlew kmp-commons:kmmBridgePublish -PENABLE_PUBLISHING=true
 // ./gradlew spmDevBuild
-kmmbridge {
-//
-    mavenPublishArtifacts()
-    addGithubPackagesRepository()
-    spm()
-}
+//kmmbridge {
+////
+//    mavenPublishArtifacts()
+//    addGithubPackagesRepository()
+//    spm()
+//}
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify

@@ -7,34 +7,55 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.prepareGet
 import io.ktor.http.contentLength
+import io.ktor.http.headers
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.core.ByteReadPacket
-import io.ktor.utils.io.core.isEmpty
-import io.ktor.utils.io.core.readBytes
+import io.ktor.utils.io.readRemaining
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.io.Source
+import kotlinx.io.readByteArray
 import okio.buffer
 import okio.use
 import kotlin.time.TimeSource.Monotonic.markNow
 
+/**
+ * DirectDownloader
+ *
+ * Provides ability to download a file directly to a target path using a DownloadRequest
+ */
 class DirectDownloader {
-    var inProgress = false // replace with https://github.com/Kotlin/kotlinx-atomicfu
+    val inProgress = atomic(false)
     private var cancelRequested = false
 
     private val _progressStateFlow = MutableStateFlow<DirectDownloadProgress>(DirectDownloadProgress.Enqueued)
     val progressStateFlow: StateFlow<DirectDownloadProgress> = _progressStateFlow
 
-    suspend fun download(httpClient: HttpClient, directDownloadRequest: DirectDownloadRequest, dispatcher: CoroutineDispatcher = Dispatchers.IO): DirectDownloadResult = withContext(dispatcher) {
-        if (inProgress) {
+    /**
+     * Download File
+     * @param httpClient Ktor HttpClient
+     * @param directDownloadRequest Request info for downloader
+     * @param dispatcher Coroutine Dispatcher to be used for the download
+     *
+     * @return DirectDownloadResult containing success flag and possible messages
+     */
+    suspend fun download(
+        httpClient: HttpClient,
+        directDownloadRequest: DirectDownloadRequest,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ): DirectDownloadResult = withContext(dispatcher) {
+        if (!inProgress.compareAndSet(expect = false, update = true)) {
             return@withContext DirectDownloadResult(false, "Download already in progress")
         }
-        inProgress = true
 
-        val directDownloadResult: DirectDownloadResult = downloadFile(httpClient, directDownloadRequest) { totalBytesRead, contentLength ->
+        val directDownloadResult: DirectDownloadResult = downloadFile(
+            httpClient = httpClient,
+            directDownloadRequest = directDownloadRequest
+        ) { totalBytesRead, contentLength ->
             _progressStateFlow.value = DirectDownloadProgress.Downloading(totalBytesRead, contentLength)
         }
 
@@ -46,7 +67,7 @@ class DirectDownloader {
     private suspend fun downloadFile(
         httpClient: HttpClient,
         directDownloadRequest: DirectDownloadRequest,
-        updateProgress: (totalBytesRead: Long, contentLength: Long) -> Unit
+        updateProgress: (totalBytesRead: Long, contentLength: Long) -> Unit,
     ): DirectDownloadResult {
         val mark = markNow()
 
@@ -57,11 +78,22 @@ class DirectDownloader {
         }
 
         val directDownloadResult: DirectDownloadResult = try {
-            httpClient.prepareGet(directDownloadRequest.downloadUrl).execute { httpResponse ->
+            val httpStatement = httpClient.prepareGet(directDownloadRequest.downloadUrl) {
+                // add any custom headers
+                headers {
+                    directDownloadRequest.customHeaders?.forEach { directDownloadHeader ->
+                        append(directDownloadHeader.name, directDownloadHeader.value)
+                    }
+                }
+            }
+
+            // execute and download
+            httpStatement.execute { httpResponse ->
                 // Parse Content-Length header value.
                 val contentLength = httpResponse.contentLength() ?: 0L
 
                 directDownloadRequest.fileSystem.sink(directDownloadRequest.targetFile).buffer().use { outputFileBufferSink ->
+                    @Suppress("UNUSED_VARIABLE") // used to provide sum to "updateProgress(...)
                     var totalBytesRead = 0L
                     val channel: ByteReadChannel = httpResponse.body()
                     while (!channel.isClosedForRead) {
@@ -69,9 +101,9 @@ class DirectDownloader {
                             return@execute DirectDownloadResult(false, "Download canceled")
                         }
 
-                        val packet: ByteReadPacket = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-                        while (!packet.isEmpty) {
-                            val bytes = packet.readBytes()
+                        val source: Source = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+                        while (!source.exhausted()) {
+                            val bytes = source.readByteArray()
 
                             outputFileBufferSink.write(bytes)
 
@@ -79,11 +111,13 @@ class DirectDownloader {
                             totalBytesRead += bytes.size
 
                             // update progress
-                            updateProgress(totalBytesRead, contentLength)
+                            if (directDownloadRequest.trackProgress && totalBytesRead % directDownloadRequest.trackProgressUpdateIntervalSize == 0L) {
+                                updateProgress(totalBytesRead, contentLength)
+                            }
                         }
                     }
                 }
-                println("A file saved to ${directDownloadRequest.targetFile}")
+                Logger.i { "A file saved to ${directDownloadRequest.targetFile}" }
                 DirectDownloadResult(success = true)
             }
         } catch (expected: Exception) {
@@ -101,8 +135,7 @@ class DirectDownloader {
         return directDownloadResult
     }
 
-
-    /*
+    /**
      * Make sure target directory exists, and target file does NOT yet exist
      */
     @Suppress("ReturnCount") // all return points are valid and needed
@@ -150,6 +183,7 @@ class DirectDownloader {
     }
 
     companion object {
-        const val DEFAULT_BUFFER_SIZE: Int = 8 * 1024
+        const val DEFAULT_BUFFER_SIZE = 8 * 1024
+        const val DEFAULT_PROGRESS_UPDATE_BYTE_SIZE = 1000L
     }
 }

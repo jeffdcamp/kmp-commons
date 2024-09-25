@@ -1,43 +1,35 @@
 [versions]
-agp = "8.2.0"
-kotlin = "2.0.0"
-kotlinxCoroutines = "1.9.0-RC"
+agp = "8.5.2" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
+kotlin = "2.0.20"
+kotlinxAtomicfu = "0.25.0"
+kotlinxCoroutines = "1.9.0"
 kotlinxSerialization = "1.7.1"
 kotlinxDateTime = "0.6.0"
 
-androidxActivity = "1.9.1"
 androidxDataStore = "1.1.1"
-androidxLifecycle = "2.8.4"
-androidxRoom = "2.7.0-alpha05"
+androidxRoom = "2.7.0-alpha06"
 
 assertK = "0.28.1"
-desugar = "2.0.4"
-detekt = "1.23.6"
+detekt = "1.23.7"
 downloadPlugin = "5.6.0"
-firebaseAnalytics = "22.0.2"
-firebaseAuth = "23.0.0"
-firebaseConfig = "22.0.0"
-firebaseCrashlytics = "19.0.3"
-firebaseFirestore = "25.0.0"
 kermit = "2.0.4"
-kmmbridge = "0.5.5"
+kmmbridge = "1.0.1"
 kover = "0.8.3"
-ktor = "2.3.12"
+ktor = "3.0.0-rc-1"
 okio = "3.9.0"
-skie = "0.8.2"
+skie = "0.9.0-RC.5"
 stately = "2.0.6"
 versionsPlugin = "0.51.0"
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 download = { id = "de.undercouch.download", version.ref = "downloadPlugin" }
 
 kmmbridge = { id = "co.touchlab.kmmbridge", version.ref = "kmmbridge" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-automicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinxAtomicfu" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
@@ -45,23 +37,11 @@ versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin
 
 [libraries]
 
-androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivity" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidxDataStore" }
-android-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
-androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidxLifecycle" }
-androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidxLifecycle" }
 androidx-room-common = { module = "androidx.room:room-common", version.ref = "androidxRoom" }
-
-# Firebase - https://firebase.google.com/support/release-notes/android
-google-firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
-google-firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
-google-firebase-config = { module = "com.google.firebase:firebase-config", version.ref = "firebaseConfig" }
-google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebaseCrashlytics" }
-google-firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore"  }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
