@@ -1,6 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -117,11 +114,10 @@ kotlin {
 
 android {
     namespace = "com.dbtools.kmp.commons"
-    compileSdk = 34
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
-        minSdk = LibInfo.AndroidSdk.MIN
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -141,12 +137,11 @@ skie {
 
 // ./gradlew kmp-commons:kmmBridgePublish -PENABLE_PUBLISHING=true
 // ./gradlew spmDevBuild
-//kmmbridge {
-////
-//    mavenPublishArtifacts()
-//    addGithubPackagesRepository()
-//    spm()
-//}
+kmmbridge {
+    mavenPublishArtifacts()
+    addGithubPackagesRepository()
+    spm()
+}
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
