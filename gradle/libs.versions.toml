@@ -10,7 +10,7 @@ androidxDataStore = "1.1.1"
 androidxRoom = "2.7.0-alpha08"
 
 android-compileSdk = "35"
-android-minSdk = "24"
+android-minSdk = "23"
 android-targetSdk = "35"
 assertK = "0.28.1"
 detekt = "1.23.7"
