@@ -7,11 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.skie)
-    alias(libs.plugins.kmmbridge)
     alias(libs.plugins.kover)
     alias(libs.plugins.download)
     id("maven-publish")
+    signing
 }
 
 kotlin {
@@ -30,7 +29,7 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
-        publishAllLibraryVariants()
+        publishLibraryVariants("release")
     }
 
     jvm()
@@ -48,7 +47,7 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
         macosX64(),
-//        macosArm64(),
+        macosArm64(),
     ).forEach {
         it.binaries.framework {
             baseName = "KMPCommons"
@@ -127,24 +126,6 @@ android {
     }
 }
 
-skie {
-    features {
-        group("co.touchlab.skie.types") {
-            analytics {
-                enabled.set(false)
-            }
-        }
-    }
-}
-
-// ./gradlew kmp-commons:kmmBridgePublish -PENABLE_PUBLISHING=true
-// ./gradlew spmDevBuild
-kmmbridge {
-    mavenPublishArtifacts()
-    addGithubPackagesRepository()
-    spm()
-}
-
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
 kover {
@@ -167,6 +148,32 @@ kover {
 // ./gradlew clean build assembleRelease publishToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
+// ./gradlew clean build assembleRelease publishAllPublicationsToMavenCentralRepository
+fun MavenPublication.mavenCentralPom() {
+    pom {
+        name.set("Kmp Commons")
+        description.set("Kmp Commons")
+        url.set("https://github.com/jeffdcamp/kmp-commons")
+        licenses {
+            license {
+                name.set("The Apache Software License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("jcampbell")
+                name.set("Jeff Campbell")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/jeffdcamp/kmp-commons.git")
+            developerConnection.set("scm:git:git@github.com:jeffdcamp/kmp-commons.git")
+            url.set("https://github.com/jeffdcamp/kmp-commons")
+        }
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -174,31 +181,42 @@ publishing {
             // groupId / version defined in gradle.properties
             from(components["kotlin"])
 
-            pom {
-                name.set(Pom.LIBRARY_NAME)
-                description.set(Pom.POM_DESCRIPTION)
-                url.set(Pom.URL)
-                licenses {
-                    license {
-                        name.set(Pom.LICENCE_NAME)
-                        url.set(Pom.LICENCE_URL)
-                        distribution.set(Pom.LICENCE_DIST)
+            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                // already has publications, just need to add javadoc task
+                val javadocJar by tasks.creating(Jar::class) {
+                    from("javadoc")
+                    archiveClassifier.set("javadoc")
+                }
+                publications.all {
+                    if (this is MavenPublication) {
+                        artifact(javadocJar)
+                        mavenCentralPom()
                     }
                 }
-                developers {
-                    developer {
-                        id.set(Pom.DEVELOPER_ID)
-                        name.set(Pom.DEVELOPER_NAME)
+                // create task to publish all apple (macos, ios, tvos, watchos) artifacts
+                val publishApple by tasks.registering {
+                    publications.all {
+                        if (name.contains(Regex("macos|ios|tvos|watchos"))) {
+                            val publicationNameForTask = name.replaceFirstChar(Char::uppercase)
+                            dependsOn("publish${publicationNameForTask}PublicationToMavenCentralRepository")
+                        }
                     }
                 }
-                scm {
-                    url.set(Pom.SCM_URL)
-                    connection.set(Pom.SCM_CONNECTION)
-                    developerConnection.set(Pom.SCM_DEV_CONNECTION)
+            } else {
+                // Need to create source, javadoc & publication
+                val java = extensions.getByType<JavaPluginExtension>()
+                java.withSourcesJar()
+                java.withJavadocJar()
+                publications {
+                    create<MavenPublication>("lib") {
+                        from(components["java"])
+                        mavenCentralPom()
+                    }
                 }
             }
         }
     }
+
     repositories {
         maven {
             name = "MavenCentral"
@@ -210,5 +228,43 @@ publishing {
                 password = sonatypeNexusPassword ?: ""
             }
         }
+    }
+}
+
+signing {
+    setRequired {
+        findProperty("signing.keyId") != null
+    }
+
+    publishing.publications.all {
+        sign(this)
+    }
+}
+
+// TODO: remove after following issues are fixed
+// https://github.com/gradle/gradle/issues/26091
+// https://youtrack.jetbrains.com/issue/KT-46466
+tasks {
+    withType<PublishToMavenRepository> {
+        dependsOn(withType<Sign>())
+    }
+
+    named("compileTestKotlinIosArm64") {
+        dependsOn(named("signIosArm64Publication"))
+    }
+    named("compileTestKotlinIosSimulatorArm64") {
+        dependsOn(named("signIosSimulatorArm64Publication"))
+    }
+    named("compileTestKotlinIosX64") {
+        dependsOn(named("signIosX64Publication"))
+    }
+    named("compileTestKotlinLinuxX64") {
+        dependsOn(named("signLinuxX64Publication"))
+    }
+    named("compileTestKotlinMacosArm64") {
+        dependsOn(named("signMacosArm64Publication"))
+    }
+    named("compileTestKotlinMacosX64") {
+        dependsOn(named("signMacosX64Publication"))
     }
 }
