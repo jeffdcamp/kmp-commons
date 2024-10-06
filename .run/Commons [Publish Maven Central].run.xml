@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Commons [iSAT]" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Commons [Publish Local]" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -10,7 +10,11 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="iosSimulatorArm64Test" />
+          <option value="clean" />
+          <option value="build" />
+          <option value="assembleRelease" />
+          <option value="publishMavenPublicationToMavenCentralRepository" />
+          <option value="publishReleasePublicationToMavenCentralRepository" />
         </list>
       </option>
       <option name="vmOptions" />
