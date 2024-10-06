@@ -13,8 +13,7 @@
           <option value="clean" />
           <option value="build" />
           <option value="assembleRelease" />
-          <option value="publishMavenPublicationToMavenLocal" />
-          <option value="publishAndroidReleasePublicationToMavenLocal" />
+          <option value="publishToMavenLocal" />
         </list>
       </option>
       <option name="vmOptions" />

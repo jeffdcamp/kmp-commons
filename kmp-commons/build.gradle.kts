@@ -92,7 +92,6 @@ kotlin {
                 implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kermit)
                 implementation(libs.touchlab.skie.annotations)
-                compileOnly(libs.androidx.room.common)
             }
         }
         val commonTest by getting {
