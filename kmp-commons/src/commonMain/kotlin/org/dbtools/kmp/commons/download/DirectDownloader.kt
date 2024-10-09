@@ -18,15 +18,30 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
+import love.forte.plugin.suspendtrans.annotation.JsPromise
 import okio.buffer
 import okio.use
+import kotlin.js.ExperimentalJsExport
+import kotlin.js.JsExport
 import kotlin.time.TimeSource.Monotonic.markNow
+
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+data class Greeting(val title: String, val row: Int) {
+
+    fun helloWorld() {
+        print("TEST Hello World")
+    }
+
+}
 
 /**
  * DirectDownloader
  *
  * Provides ability to download a file directly to a target path using a DownloadRequest
  */
+@OptIn(ExperimentalJsExport::class)
+@JsExport
 class DirectDownloader {
     val inProgress = atomic(false)
     private var cancelRequested = false
@@ -42,6 +57,8 @@ class DirectDownloader {
      *
      * @return DirectDownloadResult containing success flag and possible messages
      */
+    @JsPromise
+    @JsExport.Ignore
     suspend fun download(
         httpClient: HttpClient,
         directDownloadRequest: DirectDownloadRequest,

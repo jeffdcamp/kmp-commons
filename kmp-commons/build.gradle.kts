@@ -1,16 +1,34 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+import love.forte.plugin.suspendtrans.ClassInfo
+import love.forte.plugin.suspendtrans.SuspendTransformConfiguration
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.kotlin.serialization)
-//    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kover)
     alias(libs.plugins.download)
+    id("love.forte.plugin.suspend-transform") version "2.0.20-0.9.3"
     id("maven-publish")
 //    signing
+}
+
+suspendTransform {
+    enabled = true // default: true
+    includeRuntime = true // default: true
+    includeAnnotation = true // default: true
+    useJvmDefault()
+    addJsTransformers(        SuspendTransformConfiguration.jsPromiseTransformer.copy(
+        copyAnnotationExcludes = listOf(
+            // The generated function does not include `@JsExport.Ignore`.
+            ClassInfo("kotlin.js", "JsExport.Ignore")
+        )
+    )
+    )
 }
 
 kotlin {
@@ -25,39 +43,50 @@ kotlin {
         )
     }
 
-//    androidTarget {
-//        compilerOptions {
-//            jvmTarget.set(JvmTarget.JVM_17)
-//        }
-//        publishLibraryVariants("release")
-//    }
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+        publishLibraryVariants("release")
+    }
 
     jvm()
 
     linuxX64()
 
-    js {
+//    js(IR) {
 //        browser()
+//        nodejs()
 //        binaries.library()
 //        binaries.executable()
-//        useEsModules()
-        nodejs()
-    }
+//    }
 
-    // Mac / iOS
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-        macosX64(),
-        macosArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "KMPCommons"
-            binaryOption("bundleId", "org.dbtools.kmp.commons")
-            binaryOption("bundleVersion", property("version") as? String ?: "0.0.0")
+    js {
+
+        browser {
+            webpackTask {
+                output.libraryTarget = "this"
+                mode = KotlinWebpackConfig.Mode.DEVELOPMENT
+            }
+            binaries.executable()
         }
     }
+
+
+    // Mac / iOS
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64(),
+//        macosX64(),
+//        macosArm64(),
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "KMPCommons"
+//            binaryOption("bundleId", "org.dbtools.kmp.commons")
+//            binaryOption("bundleVersion", property("version") as? String ?: "0.0.0")
+//        }
+//    }
 
     // ==== currently unsupported ====
 //    macosArm64()
@@ -120,18 +149,18 @@ kotlin {
     }
 }
 
-//android {
-//    namespace = "com.dbtools.kmp.commons"
-//    compileSdk = libs.versions.android.compileSdk.get().toInt()
-//    defaultConfig {
-//        minSdk = libs.versions.android.minSdk.get().toInt()
-//    }
-//
-//    compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_17
-//        targetCompatibility = JavaVersion.VERSION_17
-//    }
-//}
+android {
+    namespace = "com.dbtools.kmp.commons"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
