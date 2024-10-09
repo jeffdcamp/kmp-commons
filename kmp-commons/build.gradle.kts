@@ -6,11 +6,11 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.android.library)
+//    alias(libs.plugins.android.library)
     alias(libs.plugins.kover)
     alias(libs.plugins.download)
     id("maven-publish")
-    signing
+//    signing
 }
 
 kotlin {
@@ -25,21 +25,24 @@ kotlin {
         )
     }
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-        publishLibraryVariants("release")
-    }
+//    androidTarget {
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.JVM_17)
+//        }
+//        publishLibraryVariants("release")
+//    }
 
     jvm()
 
     linuxX64()
 
-//    js {
+    js {
 //        browser()
-//        nodejs()
-//    }
+//        binaries.library()
+//        binaries.executable()
+//        useEsModules()
+        nodejs()
+    }
 
     // Mac / iOS
     listOf(
@@ -89,9 +92,14 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.okio)
-                implementation(libs.androidx.datastore.preferences)
+//                implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kermit)
                 implementation(libs.touchlab.skie.annotations)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation("com.squareup.okio:okio-nodefilesystem:3.9.1")
             }
         }
         val commonTest by getting {
@@ -112,37 +120,37 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.dbtools.kmp.commons"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+//android {
+//    namespace = "com.dbtools.kmp.commons"
+//    compileSdk = libs.versions.android.compileSdk.get().toInt()
+//    defaultConfig {
+//        minSdk = libs.versions.android.minSdk.get().toInt()
+//    }
+//
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+//}
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
-kover {
-    currentProject {
-        createVariant("lib") {
-            // adds the contents of the reports of `release` Android build variant to default reports
-            addWithDependencies("release")
-        }
-    }
-
-    reports {
-        verify {
-            rule {
-                minBound(0)
-            }
-        }
-    }
-}
+//kover {
+//    currentProject {
+//        createVariant("lib") {
+//            // adds the contents of the reports of `release` Android build variant to default reports
+//            addWithDependencies("release")
+//        }
+//    }
+//
+//    reports {
+//        verify {
+//            rule {
+//                minBound(0)
+//            }
+//        }
+//    }
+//}
 
 // ./gradlew clean build assembleRelease publishToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
@@ -229,41 +237,41 @@ publishing {
         }
     }
 }
-
-signing {
-    setRequired {
-        findProperty("signing.keyId") != null
-    }
-
-    publishing.publications.all {
-        sign(this)
-    }
-}
+//
+//signing {
+//    setRequired {
+//        findProperty("signing.keyId") != null
+//    }
+//
+//    publishing.publications.all {
+//        sign(this)
+//    }
+//}
 
 // TODO: remove after following issues are fixed
 // https://github.com/gradle/gradle/issues/26091
 // https://youtrack.jetbrains.com/issue/KT-46466
-tasks {
-    withType<PublishToMavenRepository> {
-        dependsOn(withType<Sign>())
-    }
-
-    named("compileTestKotlinIosArm64") {
-        dependsOn(named("signIosArm64Publication"))
-    }
-    named("compileTestKotlinIosSimulatorArm64") {
-        dependsOn(named("signIosSimulatorArm64Publication"))
-    }
-    named("compileTestKotlinIosX64") {
-        dependsOn(named("signIosX64Publication"))
-    }
-    named("compileTestKotlinLinuxX64") {
-        dependsOn(named("signLinuxX64Publication"))
-    }
-    named("compileTestKotlinMacosArm64") {
-        dependsOn(named("signMacosArm64Publication"))
-    }
-    named("compileTestKotlinMacosX64") {
-        dependsOn(named("signMacosX64Publication"))
-    }
-}
+//tasks {
+//    withType<PublishToMavenRepository> {
+//        dependsOn(withType<Sign>())
+//    }
+//
+//    named("compileTestKotlinIosArm64") {
+//        dependsOn(named("signIosArm64Publication"))
+//    }
+//    named("compileTestKotlinIosSimulatorArm64") {
+//        dependsOn(named("signIosSimulatorArm64Publication"))
+//    }
+//    named("compileTestKotlinIosX64") {
+//        dependsOn(named("signIosX64Publication"))
+//    }
+//    named("compileTestKotlinLinuxX64") {
+//        dependsOn(named("signLinuxX64Publication"))
+//    }
+//    named("compileTestKotlinMacosArm64") {
+//        dependsOn(named("signMacosArm64Publication"))
+//    }
+//    named("compileTestKotlinMacosX64") {
+//        dependsOn(named("signMacosX64Publication"))
+//    }
+//}

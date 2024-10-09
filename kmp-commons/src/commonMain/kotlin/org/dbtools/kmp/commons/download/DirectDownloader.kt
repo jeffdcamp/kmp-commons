@@ -13,7 +13,6 @@ import io.ktor.utils.io.readRemaining
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
@@ -46,7 +45,7 @@ class DirectDownloader {
     suspend fun download(
         httpClient: HttpClient,
         directDownloadRequest: DirectDownloadRequest,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
     ): DirectDownloadResult = withContext(dispatcher) {
         if (!inProgress.compareAndSet(expect = false, update = true)) {
             return@withContext DirectDownloadResult(false, "Download already in progress")

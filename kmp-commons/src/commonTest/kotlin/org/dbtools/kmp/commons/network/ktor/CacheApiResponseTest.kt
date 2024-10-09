@@ -21,7 +21,7 @@ import kotlin.test.Test
 class CacheApiResponseTest {
 
     @Test
-    fun `test CacheApiResponse Success`() = runTest {
+    fun testCacheApiResponseSuccess() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"success"}""",
@@ -54,7 +54,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Forbidden`() = runTest {
+    fun testCacheApiResponseErrorForbidden() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"forbidden"}""",
@@ -96,7 +96,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error NoToken`() = runTest {
+    fun testCacheApiResponseErrorNoToken() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"no token"}""",
@@ -135,7 +135,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Request No Details`() = runTest {
+    fun testCacheApiResponseErrorRequestNoDetails() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -174,7 +174,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Request With Details`() = runTest {
+    fun testCacheApiResponseErrorRequestWithDetails() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -219,7 +219,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Server`() = runTest {
+    fun testCacheApiResponseErrorServer() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -258,7 +258,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Unknown`() = runTest {
+    fun testCacheApiResponseErrorUnknown() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -297,7 +297,7 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Exception`() = runTest {
+    fun testCacheApiResponseException() = runTest {
         val mockEngine = MockEngine {
             error("Test exception")
         }

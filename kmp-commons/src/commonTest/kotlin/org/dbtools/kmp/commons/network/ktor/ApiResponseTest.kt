@@ -23,7 +23,7 @@ import kotlin.test.Test
 class ApiResponseTest {
 
     @Test
-    fun `test ApiResponse Success`() = runTest {
+    fun testApiResponseSuccess() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"success"}""",
@@ -56,7 +56,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error Forbidden`() = runTest {
+    fun testApiResponseErrorForbidden() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"forbidden"}""",
@@ -98,7 +98,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error NoToken`() = runTest {
+    fun testApiResponseErrorNoToken() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"no token"}""",
@@ -137,7 +137,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error Request No Details`() = runTest {
+    fun testApiResponseErrorRequestNoDetails() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -176,7 +176,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error Request With Details`() = runTest {
+    fun testApiResponseErrorRequestWithDetails() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -221,7 +221,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error Server`() = runTest {
+    fun testApiResponseErrorServer() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -260,7 +260,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Error Unknown`() = runTest {
+    fun testApiResponseErrorUnknown() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"status":"error"}""",
@@ -299,7 +299,7 @@ class ApiResponseTest {
     }
 
     @Test
-    fun `test ApiResponse Exception`() = runTest {
+    fun testApiResponseException() = runTest {
         val mockEngine = MockEngine {
             error("Test exception")
         }
