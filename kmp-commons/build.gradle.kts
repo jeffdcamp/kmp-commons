@@ -1,6 +1,9 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+import love.forte.plugin.suspendtrans.ClassInfo
+import love.forte.plugin.suspendtrans.SuspendTransformConfiguration
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -9,8 +12,23 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kover)
     alias(libs.plugins.download)
+    id("love.forte.plugin.suspend-transform") version "2.0.20-0.9.3"
     id("maven-publish")
-    signing
+//    signing
+}
+
+suspendTransform {
+    enabled = true // default: true
+    includeRuntime = true // default: true
+    includeAnnotation = true // default: true
+    useJvmDefault()
+    addJsTransformers(        SuspendTransformConfiguration.jsPromiseTransformer.copy(
+        copyAnnotationExcludes = listOf(
+            // The generated function does not include `@JsExport.Ignore`.
+            ClassInfo("kotlin.js", "JsExport.Ignore")
+        )
+    )
+    )
 }
 
 kotlin {
@@ -36,25 +54,39 @@ kotlin {
 
     linuxX64()
 
-//    js {
+//    js(IR) {
 //        browser()
 //        nodejs()
+//        binaries.library()
+//        binaries.executable()
 //    }
 
-    // Mac / iOS
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-        macosX64(),
-        macosArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "KMPCommons"
-            binaryOption("bundleId", "org.dbtools.kmp.commons")
-            binaryOption("bundleVersion", property("version") as? String ?: "0.0.0")
+    js {
+
+        browser {
+            webpackTask {
+                output.libraryTarget = "this"
+                mode = KotlinWebpackConfig.Mode.DEVELOPMENT
+            }
+            binaries.executable()
         }
     }
+
+
+    // Mac / iOS
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64(),
+//        macosX64(),
+//        macosArm64(),
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "KMPCommons"
+//            binaryOption("bundleId", "org.dbtools.kmp.commons")
+//            binaryOption("bundleVersion", property("version") as? String ?: "0.0.0")
+//        }
+//    }
 
     // ==== currently unsupported ====
 //    macosArm64()
@@ -89,9 +121,14 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.okio)
-                implementation(libs.androidx.datastore.preferences)
+//                implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kermit)
                 implementation(libs.touchlab.skie.annotations)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation("com.squareup.okio:okio-nodefilesystem:3.9.1")
             }
         }
         val commonTest by getting {
@@ -127,22 +164,22 @@ android {
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
-kover {
-    currentProject {
-        createVariant("lib") {
-            // adds the contents of the reports of `release` Android build variant to default reports
-            addWithDependencies("release")
-        }
-    }
-
-    reports {
-        verify {
-            rule {
-                minBound(0)
-            }
-        }
-    }
-}
+//kover {
+//    currentProject {
+//        createVariant("lib") {
+//            // adds the contents of the reports of `release` Android build variant to default reports
+//            addWithDependencies("release")
+//        }
+//    }
+//
+//    reports {
+//        verify {
+//            rule {
+//                minBound(0)
+//            }
+//        }
+//    }
+//}
 
 // ./gradlew clean build assembleRelease publishToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
@@ -229,41 +266,41 @@ publishing {
         }
     }
 }
-
-signing {
-    setRequired {
-        findProperty("signing.keyId") != null
-    }
-
-    publishing.publications.all {
-        sign(this)
-    }
-}
+//
+//signing {
+//    setRequired {
+//        findProperty("signing.keyId") != null
+//    }
+//
+//    publishing.publications.all {
+//        sign(this)
+//    }
+//}
 
 // TODO: remove after following issues are fixed
 // https://github.com/gradle/gradle/issues/26091
 // https://youtrack.jetbrains.com/issue/KT-46466
-tasks {
-    withType<PublishToMavenRepository> {
-        dependsOn(withType<Sign>())
-    }
-
-    named("compileTestKotlinIosArm64") {
-        dependsOn(named("signIosArm64Publication"))
-    }
-    named("compileTestKotlinIosSimulatorArm64") {
-        dependsOn(named("signIosSimulatorArm64Publication"))
-    }
-    named("compileTestKotlinIosX64") {
-        dependsOn(named("signIosX64Publication"))
-    }
-    named("compileTestKotlinLinuxX64") {
-        dependsOn(named("signLinuxX64Publication"))
-    }
-    named("compileTestKotlinMacosArm64") {
-        dependsOn(named("signMacosArm64Publication"))
-    }
-    named("compileTestKotlinMacosX64") {
-        dependsOn(named("signMacosX64Publication"))
-    }
-}
+//tasks {
+//    withType<PublishToMavenRepository> {
+//        dependsOn(withType<Sign>())
+//    }
+//
+//    named("compileTestKotlinIosArm64") {
+//        dependsOn(named("signIosArm64Publication"))
+//    }
+//    named("compileTestKotlinIosSimulatorArm64") {
+//        dependsOn(named("signIosSimulatorArm64Publication"))
+//    }
+//    named("compileTestKotlinIosX64") {
+//        dependsOn(named("signIosX64Publication"))
+//    }
+//    named("compileTestKotlinLinuxX64") {
+//        dependsOn(named("signLinuxX64Publication"))
+//    }
+//    named("compileTestKotlinMacosArm64") {
+//        dependsOn(named("signMacosArm64Publication"))
+//    }
+//    named("compileTestKotlinMacosX64") {
+//        dependsOn(named("signMacosX64Publication"))
+//    }
+//}

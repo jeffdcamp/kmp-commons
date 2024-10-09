@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.atomicfu) apply false
@@ -88,6 +90,6 @@ allprojects {
     }
 }
 
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
-}
+//tasks.register<Delete>("clean") {
+//    delete(rootProject.layout.buildDirectory)
+//}
