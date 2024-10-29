@@ -32,7 +32,11 @@ kotlin {
         publishLibraryVariants("release")
     }
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     linuxX64()
 
@@ -91,7 +95,7 @@ kotlin {
                 implementation(libs.okio)
                 implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kermit)
-                implementation(libs.touchlab.skie.annotations)
+//                implementation(libs.touchlab.skie.annotations)
             }
         }
         val commonTest by getting {
@@ -128,13 +132,6 @@ android {
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
 kover {
-    currentProject {
-        createVariant("lib") {
-            // adds the contents of the reports of `release` Android build variant to default reports
-            addWithDependencies("release")
-        }
-    }
-
     reports {
         verify {
             rule {

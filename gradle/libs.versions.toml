@@ -1,7 +1,7 @@
 [versions]
 agp = "8.5.2" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
-kotlin = "2.0.20"
-kotlinxAtomicfu = "0.25.0"
+kotlin = "2.0.21"
+kotlinxAtomicfu = "0.26.0"
 kotlinxCoroutines = "1.9.0"
 kotlinxSerialization = "1.7.3"
 kotlinxDateTime = "0.6.1"
@@ -17,10 +17,9 @@ downloadPlugin = "5.6.0"
 kermit = "2.0.4"
 kmmbridge = "1.0.1"
 kover = "0.8.3"
-ktor = "3.0.0-rc-2"
+ktor = "3.0.0"
 okio = "3.9.1"
-skie = "0.9.2"
-stately = "2.1.0"
+skie = "0.9.3"
 versionsPlugin = "0.51.0"
 
 [plugins]
@@ -57,9 +56,5 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
-touchlab-skie-annotations = { module = "co.touchlab.skie:configuration-annotations", version.ref = "skie" }
-touchlab-stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately"}
-
 assertK = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertK" }
 
-[bundles]
