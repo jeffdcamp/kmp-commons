@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2024-11-16
+
+### Added
+
+- Added more extension functions for kotlin-datetime
+
+### Changed
+
+- Changed JVM target to JDK 21
+- Fixed issue with executeSafelyCached
+- Updated versions
+
 ## [0.0.3] - 2024-09-30
 
 ### Added
