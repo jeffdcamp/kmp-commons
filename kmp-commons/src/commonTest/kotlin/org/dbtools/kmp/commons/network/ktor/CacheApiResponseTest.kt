@@ -14,28 +14,32 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import io.ktor.resources.Resource
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
+import org.dbtools.kmp.commons.ext.cacheHeaders
 import org.dbtools.kmp.commons.ext.executeSafelyCached
 import kotlin.test.Test
 
 class CacheApiResponseTest {
 
     @Test
-    fun `test CacheApiResponse Success`() = runTest {
+    fun `test CacheApiResponse Success Etag Data`() = runTest {
         val mockEngine = MockEngine {
+            assertThat(it.headers[HttpHeaders.IfNoneMatch]).isEqualTo("abc")
             respond(
                 content = """{"status":"success"}""",
-                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                headers = headersOf(HttpHeaders.ContentType to listOf("application/json"), HttpHeaders.ETag to listOf("def")),
                 status = HttpStatusCode.OK,
             )
         }
         val client = TestHttpClientProvider.getTestClient(mockEngine)
 
-        val response: CacheApiResponse<out DtoTest, out Unit> = client.executeSafelyCached({ get(TestResource) }) { it.body() }
+        val response: CacheApiResponse<out DtoCacheTest, out Unit> = client.executeSafelyCached({ get(CacheTestResource) { cacheHeaders("abc", null) } }) { it.body() }
 
         assertThat(response).isInstanceOf(CacheApiResponse.Success::class)
-        assertThat(response.getOrNull()).isEqualTo(DtoTest("success"))
-        assertThat(response.getOrThrow()).isEqualTo(DtoTest("success"))
+        assertThat(response.getOrNull()).isEqualTo(DtoCacheTest("success"))
+        assertThat(response.getOrThrow()).isEqualTo(DtoCacheTest("success"))
         assertThat(response.messageOrNull).isNull()
         assertThat(response.isSuccess).isTrue()
         assertThat(response.isFailure).isFalse()
@@ -43,7 +47,8 @@ class CacheApiResponseTest {
         assertThat(response.isException).isFalse()
 
         response.onSuccess {
-            assertThat(data).isEqualTo(DtoTest("success"))
+            assertThat(data).isEqualTo(DtoCacheTest("success"))
+            assertThat(etag).isEqualTo("def")
         }.onFailure {
             fail("Should not be called")
         }.onError {
@@ -54,45 +59,109 @@ class CacheApiResponseTest {
     }
 
     @Test
-    fun `test CacheApiResponse Error Forbidden`() = runTest {
+    fun `test CacheApiResponse Success Etag No Data`() = runTest {
         val mockEngine = MockEngine {
+            assertThat(it.headers[HttpHeaders.IfNoneMatch]).isEqualTo("def")
             respond(
-                content = """{"status":"forbidden"}""",
-                headers = headersOf(HttpHeaders.ContentType, "application/json"),
-                status = HttpStatusCode.Forbidden,
+                content = "",
+                headers = headersOf(HttpHeaders.ETag to listOf("def")),
+                status = HttpStatusCode.NotModified,
             )
         }
         val client = TestHttpClientProvider.getTestClient(mockEngine)
 
-        val response: CacheApiResponse<out DtoTest, out Unit> = client.executeSafelyCached({ get(TestResource) }) { it.body() }
+        val response: CacheApiResponse<out DtoCacheTest, out Unit> = client.executeSafelyCached({ get(CacheTestResource) { cacheHeaders("def", null) } }) { it.body() }
 
-        assertThat(response).isInstanceOf(CacheApiResponse.Failure.Error.Forbidden::class)
+        assertThat(response).isInstanceOf(CacheApiResponse.Success::class)
         assertThat(response.getOrNull()).isNull()
-        try {
-            assertThat(response.getOrThrow())
-            fail("Should throw exception")
-        } catch (e: Exception) {
-            assertThat(e).isInstanceOf(RuntimeException::class)
-            assertThat(e.message).isEqualTo("Error executing service call: GET http://localhost/test (403 Forbidden)")
-        }
-        assertThat(response.messageOrNull).isEqualTo("Error executing service call: GET http://localhost/test (403 Forbidden)")
-        assertThat(response.isSuccess).isFalse()
-        assertThat(response.isFailure).isTrue()
-        assertThat(response.isError).isTrue()
+        assertThat(response.getOrThrow()).isNull()
+        assertThat(response.messageOrNull).isNull()
+        assertThat(response.isSuccess).isTrue()
+        assertThat(response.isFailure).isFalse()
+        assertThat(response.isError).isFalse()
         assertThat(response.isException).isFalse()
 
         response.onSuccess {
-            fail("Should not be called")
+            assertThat(data).isNull()
+            assertThat(etag).isEqualTo("def")
         }.onFailure {
-            assertThat(message()).isEqualTo("Error executing service call: GET http://localhost/test (403 Forbidden)")
+            fail("Should not be called")
         }.onError {
-            assertThat(message).isEqualTo("Error executing service call: GET http://localhost/test (403 Forbidden)")
+            fail("Should not be called")
         }.onException {
             fail("Should not be called")
         }
+    }
 
-        assertThat(response.getOrElse(DtoTest("default"))).isEqualTo(DtoTest("default"))
-        assertThat(response.getOrElse { DtoTest("default") }).isEqualTo(DtoTest("default"))
+    @Test
+    fun `test CacheApiResponse Success LastModified Data`() = runTest {
+        val mockEngine = MockEngine {
+            assertThat(it.headers[HttpHeaders.IfModifiedSince]).isEqualTo("abc")
+
+            respond(
+                content = """{"status":"success"}""",
+                headers = headersOf(HttpHeaders.ContentType to listOf("application/json"), HttpHeaders.LastModified to listOf("def")),
+                status = HttpStatusCode.OK,
+            )
+        }
+        val client = TestHttpClientProvider.getTestClient(mockEngine)
+
+        val response: CacheApiResponse<out DtoCacheTest, out Unit> = client.executeSafelyCached({ get(CacheTestResource) { cacheHeaders(null, "abc") } }) { it.body() }
+
+        assertThat(response).isInstanceOf(CacheApiResponse.Success::class)
+        assertThat(response.getOrNull()).isEqualTo(DtoCacheTest("success"))
+        assertThat(response.getOrThrow()).isEqualTo(DtoCacheTest("success"))
+        assertThat(response.messageOrNull).isNull()
+        assertThat(response.isSuccess).isTrue()
+        assertThat(response.isFailure).isFalse()
+        assertThat(response.isError).isFalse()
+        assertThat(response.isException).isFalse()
+
+        response.onSuccess {
+            assertThat(data).isEqualTo(DtoCacheTest("success"))
+            assertThat(lastModified).isEqualTo("def")
+        }.onFailure {
+            fail("Should not be called")
+        }.onError {
+            fail("Should not be called")
+        }.onException {
+            fail("Should not be called")
+        }
+    }
+
+    @Test
+    fun `test CacheApiResponse Success LastModified No Data`() = runTest {
+        val mockEngine = MockEngine {
+            assertThat(it.headers[HttpHeaders.IfModifiedSince]).isEqualTo("def")
+            respond(
+                content = "",
+                headers = headersOf(HttpHeaders.LastModified to listOf("def")),
+                status = HttpStatusCode.NotModified,
+            )
+        }
+        val client = TestHttpClientProvider.getTestClient(mockEngine)
+
+        val response: CacheApiResponse<out DtoCacheTest, out Unit> = client.executeSafelyCached({ get(CacheTestResource) { cacheHeaders(null, "def") } }) { it.body() }
+
+        assertThat(response).isInstanceOf(CacheApiResponse.Success::class)
+        assertThat(response.getOrNull()).isNull()
+        assertThat(response.getOrThrow()).isNull()
+        assertThat(response.messageOrNull).isNull()
+        assertThat(response.isSuccess).isTrue()
+        assertThat(response.isFailure).isFalse()
+        assertThat(response.isError).isFalse()
+        assertThat(response.isException).isFalse()
+
+        response.onSuccess {
+            assertThat(data).isNull()
+            assertThat(lastModified).isEqualTo("def")
+        }.onFailure {
+            fail("Should not be called")
+        }.onError {
+            fail("Should not be called")
+        }.onException {
+            fail("Should not be called")
+        }
     }
 
     @Test
@@ -333,3 +402,8 @@ class CacheApiResponseTest {
 
     }
 }
+
+@Serializable
+private data class DtoCacheTest(    val status: String)
+@Resource("test")
+private object CacheTestResource
