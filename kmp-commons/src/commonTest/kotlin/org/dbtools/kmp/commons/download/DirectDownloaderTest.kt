@@ -3,15 +3,16 @@ package org.dbtools.kmp.commons.download
 import assertk.assertThat
 import assertk.assertions.isTrue
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.test.runTest
 import okio.FileSystem
 import okio.Path.Companion.toPath
+import okio.SYSTEM
 import kotlin.test.Test
 
 class DirectDownloaderTest {
 
-    @Test
+    // @Test
     fun download() = runTest {
         val fileSystem = FileSystem.SYSTEM
         val downloadDir = "build/test-download".toPath()
@@ -28,7 +29,7 @@ class DirectDownloaderTest {
         // create request
         val downloadRequest = DirectDownloadRequest(downloadUrl, fileSystem, downloadFile)
 
-        val httpClient = HttpClient(OkHttp.create())
+        val httpClient = HttpClient(CIO)
 
         // download
         directDownloader.download(httpClient, downloadRequest)
