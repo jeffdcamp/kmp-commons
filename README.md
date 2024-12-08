@@ -7,7 +7,6 @@ Helpers for
 
 * Analytics
 * Datastore
-* Room kotlin-datetime converters
 * Ktor
     * DirectDownloader
     * ApiResponse
@@ -24,52 +23,6 @@ Helpers for
     * Csv Export
     * EmailUtil
     * NumberFormatExt
-
-## Publishing Locally
-
-#### Publish Android, Jvm, Linux
-```shell
-./gradlew clean build assembleRelease publishToMavenLocal
-```
-
-#### Android
-```shell
-./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
-```
-
-#### iOS
-```shell
-./gradlew clean spmDevBuild
-```
-
-## Publish Release Build
-* Edit `kmp-commons/gradle.properties` and set the version
-* Edit `CHANGELOG.md` set the version and date, update the `Unreleased` link and add the version link
-* Commit these files with the message `Prep Release <version>`
-
-Run Tests
-```shell
-./gradlew clean tRUT iSAT
-```
-
-#### Publish ALL
-```shell
-./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
-```
-
-#### Publish iOS
-```shell
-./gradlew kmp-commons:kmmBridgePublish -PENABLE_PUBLISHING=true
-```
-* Commit `Package.swift` with message `<version>`
-* Tag commit `<version>`
-* Push commit and tag to repo
-* Create release on Github
-
-#### Publish Android
-```shell
-./gradlew clean build assembleRelease publishMavenPublicationToMavenCentralRepository publishReleasePublicationToMavenCentralRepository
-```
 
 License
 =======

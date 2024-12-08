@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-12-08
+
+### Added
+
+- Added Instant.isToday(), DayOfWeek.plus(), DayOfWeek.minus() to KotlinDateTimeExt
+
+### Changed
+
+- Kotlin 2.1.0
+- Ktor 3.0.2
+- Kermit 2.0.5
+- AGP 8.7.3
+- Gradle 8.11.1
+
 ## [1.0.0] - 2024-11-16
 
 ### Added

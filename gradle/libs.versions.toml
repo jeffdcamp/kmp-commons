@@ -1,7 +1,7 @@
 [versions]
-agp = "8.5.2" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
-kotlin = "2.0.21"
-kotlinxAtomicfu = "0.26.0"
+agp = "8.7.3" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
+kotlin = "2.1.0"
+kotlinxAtomicfu = "0.26.1"
 kotlinxCoroutines = "1.9.0"
 kotlinxSerialization = "1.7.3"
 kotlinxDateTime = "0.6.1"
@@ -10,16 +10,13 @@ androidxDataStore = "1.1.1"
 
 android-compileSdk = "35"
 android-minSdk = "23"
-android-targetSdk = "35"
 assertK = "0.28.1"
 detekt = "1.23.7"
 downloadPlugin = "5.6.0"
-kermit = "2.0.4"
-kmmbridge = "1.0.1"
+kermit = "2.0.5"
 kover = "0.8.3"
-ktor = "3.0.1"
+ktor = "3.0.2"
 okio = "3.9.1"
-skie = "0.9.3"
 versionsPlugin = "0.51.0"
 
 [plugins]
@@ -28,12 +25,10 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 download = { id = "de.undercouch.download", version.ref = "downloadPlugin" }
 
-kmmbridge = { id = "co.touchlab.kmmbridge", version.ref = "kmmbridge" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinxAtomicfu" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-skie = { id = "co.touchlab.skie", version.ref = "skie" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
 
 [libraries]
@@ -51,7 +46,6 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
