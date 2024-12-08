@@ -110,6 +110,15 @@ fun LocalTime.Companion.now(timeZone: TimeZone = TimeZone.currentSystemDefault()
 fun LocalDateTime.Companion.now(timeZone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime = Clock.System.now().toLocalDateTime(timeZone)
 fun LocalDateTime.toEpochMilliseconds(timeZone: TimeZone = TimeZone.currentSystemDefault()): Long = this.toInstant(timeZone).toEpochMilliseconds()
 
+fun Instant.isToday(timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean = Clock.System.todayIn(timeZone) == toLocalDateTime(timeZone).date
 fun LocalDate.atStartOfDay(): LocalDateTime = atTime(0, 0)
 fun LocalDate.atEndOfDay(): LocalDateTime = atTime(23, 59, 59, 59)
 fun LocalDate.atEndOfDay(timeZone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime = plus(DatePeriod(days = 1)).atStartOfDayIn(timeZone).minus(1.seconds).toLocalDateTime(timeZone)
+
+// ===== DayOfWeek =====
+operator fun DayOfWeek.plus(days: Long): DayOfWeek {
+    val amount = (days % 7).toInt()
+    return DayOfWeek.entries[(ordinal + (amount + 7)) % 7]
+}
+
+operator fun DayOfWeek.minus(days: Long): DayOfWeek = plus(-(days % 7))
