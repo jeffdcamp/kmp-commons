@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.prepareGet
 import io.ktor.http.contentLength
 import io.ktor.http.headers
+import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readRemaining
 import kotlinx.atomicfu.atomic
@@ -89,6 +90,10 @@ class DirectDownloader {
 
             // execute and download
             httpStatement.execute { httpResponse ->
+                if (!httpResponse.status.isSuccess()) {
+                    return@execute DirectDownloadResult(false, "Failed to download file: ${httpResponse.status}")
+                }
+
                 // Parse Content-Length header value.
                 val contentLength = httpResponse.contentLength() ?: 0L
 
