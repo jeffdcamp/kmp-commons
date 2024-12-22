@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.atomicfu)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kover)
+//    alias(libs.plugins.kover)
     alias(libs.plugins.download)
     id("maven-publish")
     signing
@@ -134,15 +134,15 @@ android {
 
 // ./gradlew koverHtmlReport
 // ./gradlew koverVerify
-kover {
-    reports {
-        verify {
-            rule {
-                minBound(0)
-            }
-        }
-    }
-}
+//kover {
+//    reports {
+//        verify {
+//            rule {
+//                minBound(0)
+//            }
+//        }
+//    }
+//}
 
 // ./gradlew clean build assembleRelease publishToMavenLocal
 // ./gradlew clean build assembleRelease publishMavenPublicationToMavenLocal publishAndroidReleasePublicationToMavenLocal
