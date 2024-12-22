@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2024-12-08
+
+### Added
+
+- Added KotlinDateTimeExt: weeksUntil, changed extensions that use 'Clock.System' to pass it in as a property
+- Added check for httpResponse success on DirectDownloader
+
 ## [1.1.0] - 2024-12-08
 
 ### Added
