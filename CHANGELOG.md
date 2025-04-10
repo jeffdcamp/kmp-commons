@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2025-04-10
+
+### Changed
+
+- Kotlin 2.1.20
+- Ktor 3.1.2
+- Kotlin Serialization 1.8.1
+- Kotlin DateTime 0.6.2
+- Kotlin Atomicfu 0.27.0
+- Okio 3.11.0
+- Datastore 1.1.4
+- Gradle 8.11.1
+
+
 ## [1.1.1] - 2024-12-08
 
 ### Added
