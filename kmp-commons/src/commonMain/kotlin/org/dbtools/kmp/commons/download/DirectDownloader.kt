@@ -1,4 +1,5 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
+@file:OptIn(ExperimentalAtomicApi::class)
 
 package org.dbtools.kmp.commons.download
 
@@ -11,7 +12,6 @@ import io.ktor.http.headers
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readRemaining
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -22,6 +22,8 @@ import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import okio.buffer
 import okio.use
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.TimeSource.Monotonic.markNow
 
 /**
@@ -30,7 +32,7 @@ import kotlin.time.TimeSource.Monotonic.markNow
  * Provides ability to download a file directly to a target path using a DownloadRequest
  */
 class DirectDownloader {
-    val inProgress = atomic(false)
+    val inProgress = AtomicBoolean(false)
     private var cancelRequested = false
 
     private val _progressStateFlow = MutableStateFlow<DirectDownloadProgress>(DirectDownloadProgress.Enqueued)
@@ -49,7 +51,7 @@ class DirectDownloader {
         directDownloadRequest: DirectDownloadRequest,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
     ): DirectDownloadResult = withContext(dispatcher) {
-        if (!inProgress.compareAndSet(expect = false, update = true)) {
+        if (!inProgress.compareAndSet(expectedValue = false, newValue = true)) {
             return@withContext DirectDownloadResult(false, "Download already in progress")
         }
 

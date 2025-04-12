@@ -1,7 +1,6 @@
 [versions]
 agp = "8.7.3" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
 kotlin = "2.1.20"
-kotlinxAtomicfu = "0.27.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxSerialization = "1.8.1"
 kotlinxDateTime = "0.6.2"
@@ -20,13 +19,10 @@ okio = "3.11.0"
 versionsPlugin = "0.52.0"
 
 [plugins]
-android-library = { id = "com.android.library", version.ref = "agp" }
-
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 download = { id = "de.undercouch.download", version.ref = "downloadPlugin" }
-
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlin-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinxAtomicfu" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }

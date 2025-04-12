@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2025-04-12
+
+### Changed
+
+- Changed Atomicfu to Kotlin 2.1.20 Standard Library: Common atomic types
+- Changed Android Gradle Library Plugin to "com.android.kotlin.multiplatform.library"
+
 ## [1.1.2] - 2025-04-10
 
 ### Changed
