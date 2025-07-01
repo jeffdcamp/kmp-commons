@@ -17,11 +17,11 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     compilerOptions {
-        freeCompilerArgs.set(
-            listOf(
-                "-opt-in=kotlin.uuid.ExperimentalUuidApi",
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            )
+        optIn.add("kotlin.uuid.ExperimentalUuidApi")
+        optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
+        optIn.add("kotlin.time.ExperimentalTime")
+        freeCompilerArgs.addAll(
+//            "-Xcontext-parameters",
         )
     }
 

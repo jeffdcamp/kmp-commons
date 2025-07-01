@@ -2,7 +2,7 @@ package org.dbtools.kmp.commons.ext
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.test.Test
 
 class KotlinDateTimeExtKtTest {
