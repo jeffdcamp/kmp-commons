@@ -141,7 +141,7 @@ kotlin {
 // ./gradlew clean build check publishToMavenLocal
 // ./gradlew clean build check publishToMavenCentral
 mavenPublishing {
-    coordinates("org.dbtools.kmp", "kmp-commons", "1.1.4.1") // set version in gradle.properties also
+    coordinates("org.dbtools.kmp", "kmp-commons", "1.2.0") // set version in gradle.properties also
     publishToMavenCentral()
     signAllPublications()
 
