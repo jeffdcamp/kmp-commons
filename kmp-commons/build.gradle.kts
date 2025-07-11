@@ -63,7 +63,8 @@ kotlin {
         it.binaries.framework {
             baseName = "KMPCommons"
             binaryOption("bundleId", "org.dbtools.kmp.commons")
-            binaryOption("bundleVersion", property("version") as? String ?: "0.0.0")
+            val version: String by project
+            binaryOption("bundleVersion", version)
         }
     }
 
@@ -141,7 +142,8 @@ kotlin {
 // ./gradlew clean build check publishToMavenLocal
 // ./gradlew clean build check publishToMavenCentral
 mavenPublishing {
-    coordinates("org.dbtools.kmp", "kmp-commons", "1.2.0") // set version in gradle.properties also
+    val version: String by project
+    coordinates("org.dbtools.kmp", "kmp-commons", version)
     publishToMavenCentral()
     signAllPublications()
 
