@@ -1,6 +1,21 @@
 package org.dbtools.kmp.commons.ext
 
-import kotlinx.datetime.*
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.atTime
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 import kotlin.math.floor
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -230,7 +245,7 @@ fun LocalDateTime.Companion.now(clock: Clock = Clock.System, timeZone: TimeZone 
 fun LocalDateTime.toEpochMilliseconds(timeZone: TimeZone = TimeZone.currentSystemDefault()): Long = this.toInstant(timeZone).toEpochMilliseconds()
 
 fun Instant.isToday(clock: Clock = Clock.System, timeZone: TimeZone = TimeZone.currentSystemDefault()): Boolean = clock.todayIn(timeZone) == toLocalDateTime(timeZone).date
-fun Instant.atStartOfDay(clock: Clock = Clock.System, timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant = toLocalDateTime(timeZone).date.atStartOfDayIn(timeZone)
+fun Instant.atStartOfDay(timeZone: TimeZone = TimeZone.currentSystemDefault()): Instant = toLocalDateTime(timeZone).date.atStartOfDayIn(timeZone)
 fun LocalDate.atStartOfDay(): LocalDateTime = atTime(0, 0)
 fun LocalDate.atEndOfDay(): LocalDateTime = atTime(23, 59, 59, 59)
 fun LocalDate.atEndOfDay(timeZone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime = plus(DatePeriod(days = 1)).atStartOfDayIn(timeZone).minus(1.seconds).toLocalDateTime(timeZone)
