@@ -10,7 +10,7 @@ plugins {
 //    alias(libs.plugins.kover)
     alias(libs.plugins.download)
     alias(libs.plugins.vanniktechPublishing)
-    signing
+//    signing
 }
 
 kotlin {
@@ -171,15 +171,15 @@ mavenPublishing {
     }
 }
 
-signing {
-    setRequired {
-        findProperty("signing.keyId") != null
-    }
-
-    publishing.publications.all {
-        sign(this)
-    }
-}
+//signing {
+//    setRequired {
+//        findProperty("signing.keyId") != null
+//    }
+//
+//    publishing.publications.all {
+//        sign(this)
+//    }
+//}
 
 // TODO: remove after following issues are fixed
 // https://github.com/gradle/gradle/issues/26091
