@@ -7,10 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.library)
-//    alias(libs.plugins.kover)
     alias(libs.plugins.download)
     alias(libs.plugins.vanniktechPublishing)
-//    signing
 }
 
 kotlin {
@@ -20,9 +18,6 @@ kotlin {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
         optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
         optIn.add("kotlin.time.ExperimentalTime")
-        freeCompilerArgs.addAll(
-//            "-Xcontext-parameters",
-        )
     }
 
     androidLibrary {
@@ -103,7 +98,6 @@ kotlin {
                 implementation(libs.okio)
                 implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kermit)
-//                implementation(libs.touchlab.skie.annotations)
             }
         }
         val commonTest by getting {
@@ -142,79 +136,14 @@ kotlin {
 // ./gradlew clean build check publishToMavenLocal
 // ./gradlew clean build check publishToMavenCentral
 mavenPublishing {
-    val version: String by project
-    coordinates("org.dbtools.kmp", "kmp-commons", version)
     publishToMavenCentral()
     signAllPublications()
 
-    pom {
-        name.set("Kmp Commons")
-        description.set("Kmp Commons")
-        url.set("https://github.com/jeffdcamp/kmp-commons")
-        licenses {
-            license {
-                name.set("The Apache Software License, Version 2.0")
-                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set("jcampbell")
-                name.set("Jeff Campbell")
-            }
-        }
-        scm {
-            connection.set("scm:git:git://github.com/jeffdcamp/kmp-commons.git")
-            developerConnection.set("scm:git:git@github.com:jeffdcamp/kmp-commons.git")
-            url.set("https://github.com/jeffdcamp/kmp-commons")
-        }
-    }
-}
-
-//signing {
-//    setRequired {
-//        findProperty("signing.keyId") != null
-//    }
-//
-//    publishing.publications.all {
-//        sign(this)
-//    }
-//}
-
-// TODO: remove after following issues are fixed
-// https://github.com/gradle/gradle/issues/26091
-// https://youtrack.jetbrains.com/issue/KT-46466
-tasks {
-    withType<PublishToMavenRepository> {
-        dependsOn(withType<Sign>())
-    }
-
-    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-        named("compileTestKotlinIosArm64") {
-            dependsOn(named("signIosArm64Publication"))
-        }
-        named("compileTestKotlinIosSimulatorArm64") {
-            dependsOn(named("signIosSimulatorArm64Publication"))
-        }
-        named("compileTestKotlinIosX64") {
-            dependsOn(named("signIosX64Publication"))
-        }
-        named("compileTestKotlinMacosArm64") {
-            dependsOn(named("signMacosArm64Publication"))
-        }
-        named("compileTestKotlinMacosX64") {
-            dependsOn(named("signMacosX64Publication"))
-        }
-
-        // Mac can also do Linux signing
-        named("compileTestKotlinLinuxX64") {
-            dependsOn(named("signLinuxX64Publication"))
-        }
-    }
-
-    if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
-        named("compileTestKotlinLinuxX64") {
-            dependsOn(named("signLinuxX64Publication"))
-        }
-    }
+    configure(
+        com.vanniktech.maven.publish.KotlinMultiplatform(
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
+            sourcesJar = true,
+            androidVariantsToPublish = listOf("release"),
+        )
+    )
 }
