@@ -1,11 +1,15 @@
 package org.dbtools.kmp.commons.serialization
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.Instant
 
 /**
  * Because 'value class' do not work well for KMP (not supported on all platforms) data classes can be used instead.
@@ -79,4 +83,44 @@ open class DataClassBooleanSerializer<T : DataValueBooleanClass>(serialName: Str
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.BOOLEAN)
     override fun serialize(encoder: Encoder, value: T): Unit = encoder.encodeBoolean(value.value)
     override fun deserialize(decoder: Decoder): T = createInstance(decoder.decodeBoolean())
+}
+
+interface DataValueInstantClass {
+    val value: Instant
+}
+
+open class DataClassInstantSerializer<T : DataValueInstantClass>(serialName: String, val createInstance: (Instant) -> T) : KSerializer<T> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: T): Unit = encoder.encodeString(value.value.toString())
+    override fun deserialize(decoder: Decoder): T = createInstance(Instant.parse(decoder.decodeString()))
+}
+
+interface DataValueLocalDateClass {
+    val value: LocalDate
+}
+
+open class DataClassLocalDateSerializer<T : DataValueLocalDateClass>(serialName: String, val createInstance: (LocalDate) -> T) : KSerializer<T> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: T): Unit = encoder.encodeString(value.value.toString())
+    override fun deserialize(decoder: Decoder): T = createInstance(LocalDate.parse(decoder.decodeString()))
+}
+
+interface DataValueLocalTimeClass {
+    val value: LocalTime
+}
+
+open class DataClassLocalTimeSerializer<T : DataValueLocalTimeClass>(serialName: String, val createInstance: (LocalTime) -> T) : KSerializer<T> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: T): Unit = encoder.encodeString(value.value.toString())
+    override fun deserialize(decoder: Decoder): T = createInstance(LocalTime.parse(decoder.decodeString()))
+}
+
+interface DataValueLocalDateTimeClass {
+    val value: LocalDateTime
+}
+
+open class DataClassLocalDateTimeSerializer<T : DataValueLocalDateTimeClass>(serialName: String, val createInstance: (LocalDateTime) -> T) : KSerializer<T> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: T): Unit = encoder.encodeString(value.value.toString())
+    override fun deserialize(decoder: Decoder): T = createInstance(LocalDateTime.parse(decoder.decodeString()))
 }
