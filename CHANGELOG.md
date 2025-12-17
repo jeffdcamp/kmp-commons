@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-12-15
+
+### Added
+- Added DataValueClassSerializer for Instant, LocalDate, LocalTime, and LocalDateTime
+
+### Changed
+- Updated versions
+
 ## [1.3.0] - 2025-11-15
 
 ### Added
