@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-02-04
+
+### Added
+- Added Uri class
+
+### Changed
+- Updated Gradle to 9.3.1, AGP to 9.0.0, and Kotlin to 2.3.0
+- Migrated Detekt to 2.0.0-alpha.2 and updated task configuration
+- Refactored Android compiler options
+- Minor code cleanups
+
 ## [1.4.1] - 2025-12-23
 
 ### Changed
 - Rollback Kotlin to 2.2.21 (better support different KMP libraries (Example: SKIE))
-
 
 ## [1.4.0] - 2025-12-15
 
