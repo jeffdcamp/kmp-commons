@@ -82,6 +82,11 @@ kotlin {
 
 
     sourceSets {
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.androidx.core.ktx)
+            }
+        }
         val commonMain by getting {
             dependencies {
                 //put your multiplatform dependencies here
