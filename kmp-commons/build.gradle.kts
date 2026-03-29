@@ -44,10 +44,8 @@ kotlin {
 
     // Mac / iOS
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
-        macosX64(),
         macosArm64(),
     ).forEach {
         it.binaries.framework {
@@ -59,10 +57,6 @@ kotlin {
     }
 
     // ==== currently unsupported ====
-//    macosArm64()
-//    iosX64()
-//    iosArm64()
-//    iosSimulatorArm64()
 //    watchosArm32()
 //    watchosArm64()
 //    watchosSimulatorArm64()
