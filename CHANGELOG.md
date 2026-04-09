@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-04-08
+
+### Added
+- Added KMP network connectivity utilities (NetworkUtil, ConnectionInfo)
+- Added KMP language code conversion utilities (LanguageCode)
+
+### Changed
+- Removed iosX64 and macosX64 targets
+- Updated Kotlin to 2.3.20, AGP to 9.1.0, Ktor to 3.4.2
+- Updated Kermit to 2.1.0, Okio to 3.17.0, Kover to 0.9.8
+- Updated AndroidX DataStore to 1.2.1, Core KTX to 1.18.0
+
 ## [1.5.1] - 2026-02-18
 
 ### Added
