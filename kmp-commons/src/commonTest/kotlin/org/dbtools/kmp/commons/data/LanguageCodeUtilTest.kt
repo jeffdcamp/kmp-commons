@@ -24,8 +24,19 @@ class LanguageCodeUtilTest {
     @Test
     fun testBcp47WithRegionToIso3() {
         assertThat(LanguageCode("en-US").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("eng"))
-        assertThat(LanguageCode("zh-Hans").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("zho"))
         assertThat(LanguageCode("pt-BR").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("por"))
+    }
+
+    @Test
+    fun testChineseVariants() {
+        // BCP47 -> ISO 639-3
+        assertThat(LanguageCode("zh").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("zho"))
+        assertThat(LanguageCode("zh-Hans").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("zhs"))
+        assertThat(LanguageCode("zh-Hant").toLanguageCodeIso3()).isNotNull().isEqualTo(LanguageCodeIso3("zho"))
+
+        // ISO 639-3 -> BCP47 (reverse prefers more specific codes)
+        assertThat(LanguageCodeIso3("zho").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("zh-Hant"))
+        assertThat(LanguageCodeIso3("zhs").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("zh-Hans"))
     }
 
     @Test
@@ -35,7 +46,7 @@ class LanguageCodeUtilTest {
         assertThat(LanguageCodeIso3("deu").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("de"))
         assertThat(LanguageCodeIso3("spa").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("es"))
         assertThat(LanguageCodeIso3("jpn").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("ja"))
-        assertThat(LanguageCodeIso3("zho").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("zh"))
+        assertThat(LanguageCodeIso3("zho").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("zh-Hant"))
         assertThat(LanguageCodeIso3("por").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("pt"))
         assertThat(LanguageCodeIso3("rus").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("ru"))
         assertThat(LanguageCodeIso3("kor").toLanguageCode()).isNotNull().isEqualTo(LanguageCode("ko"))

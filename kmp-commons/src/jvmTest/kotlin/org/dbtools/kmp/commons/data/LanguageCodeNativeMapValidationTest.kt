@@ -63,9 +63,9 @@ class LanguageCodeNativeMapValidationTest {
     @Test
     fun `static map should not contain codes absent from JVM`() {
         val jvmMap = getJvmIso1ToIso3Map()
-        // Deprecated codes ("in", "iw", "ji", "mo") are aliases kept intentionally — exclude from this check
-        val deprecatedAliases = setOf("in", "iw", "ji", "mo")
-        val extra = LanguageCodeUtil.ISO_639_1_TO_ISO_639_3.filter { (iso1, _) -> iso1 !in jvmMap && iso1 !in deprecatedAliases }
+        // Deprecated codes and BCP47 script-tagged codes are kept intentionally — exclude from this check
+        val nonJvmAliases = setOf("in", "iw", "ji", "mo", "zh-Hans", "zh-Hant")
+        val extra = LanguageCodeUtil.ISO_639_1_TO_ISO_639_3.filter { (iso1, _) -> iso1 !in jvmMap && iso1 !in nonJvmAliases }
 
         if (extra.isNotEmpty()) {
             fail(

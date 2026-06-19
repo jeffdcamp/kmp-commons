@@ -32,13 +32,11 @@ import org.dbtools.kmp.commons.data.LanguageCodeUtil.ISO_639_1_TO_ISO_639_3
  */
 object LanguageCodeUtil {
     /**
-     * ISO 639-1 (2-letter) to ISO 639-3 (3-letter) language code mapping.
+     * BCP 47 language code to ISO 639-3 (3-letter) language code mapping.
      *
-     * Includes deprecated BCP 47 codes as aliases:
-     * - "in" -> "ind" (deprecated alias for "id", Indonesian)
-     * - "iw" -> "heb" (deprecated alias for "he", Hebrew)
-     * - "ji" -> "yid" (deprecated alias for "yi", Yiddish)
-     * - "mo" -> "mol" (deprecated alias for "ro", Moldavian/Romanian)
+     * Most entries are ISO 639-1 (2-letter) to ISO 639-3 mappings, but the map also includes:
+     * - Deprecated BCP 47 codes as aliases: "in" -> "ind", "iw" -> "heb", "ji" -> "yid", "mo" -> "mol"
+     * - BCP 47 codes with script subtags for Chinese variants: "zh-Hans" -> "zhs", "zh-Hant" -> "zho"
      */
     internal val ISO_639_1_TO_ISO_639_3: Map<String, String> by lazy { mapOf(
         "aa" to "aar", "ab" to "abk", "ae" to "ave", "af" to "afr", "ak" to "aka",
@@ -88,24 +86,41 @@ object LanguageCodeUtil {
         "wa" to "wln", "wo" to "wol",
         "xh" to "xho",
         "yi" to "yid", "yo" to "yor",
-        "za" to "zha", "zh" to "zho", "zu" to "zul",
+        "za" to "zha", "zh" to "zho", "zh-Hans" to "zhs", "zh-Hant" to "zho", "zu" to "zul",
     ) }
 
     /**
      * ISO 639-3 (3-letter) to ISO 639-1 (2-letter) language code mapping.
      */
-    private val ISO_639_3_TO_ISO_639_1: Map<String, String> by lazy {
+    private val ISO_639_3_TO_BCP47: Map<String, String> by lazy {
         buildMap {
-            ISO_639_1_TO_ISO_639_3.forEach { (iso1, iso3) ->
-                // Only keep the first mapping for each iso3 code (avoids deprecated codes like "in"/"iw"/"ji" overwriting)
-                if (!containsKey(iso3)) {
-                    put(iso3, iso1)
+            ISO_639_1_TO_ISO_639_3.forEach { (bcp47, iso3) ->
+                val existing = get(iso3)
+                // Prefer longer/more specific BCP47 codes (e.g., "zh-Hant" over "zh")
+                // For same-length codes, keep the first mapping (avoids deprecated codes like "in"/"iw"/"ji" overwriting)
+                if (existing == null || bcp47.length > existing.length) {
+                    put(iso3, bcp47)
                 }
             }
         }
     }
 
     fun toLanguageCodeIso3(languageCode: LanguageCode): LanguageCodeIso3? {
+        // Check full BCP47 value first (handles script-tagged codes like "zh-Hans" -> "zhs")
+//        val fullValue = languageCode.value.lowercase()
+
+        // Normalize to BCP 47 canonical casing: language lowercase, script title-case
+        val fullValue = languageCode.value.split('-').joinToString("-") { part ->
+            if (part.length == 4 && part.all { it.isLetter() }) {
+                part.lowercase().replaceFirstChar { it.uppercase() }
+            } else {
+                part.lowercase()
+            }
+        }
+        ISO_639_1_TO_ISO_639_3[fullValue]?.let { return LanguageCodeIso3(it) }
+
+
+        // Fall back to primary language only
         val primaryLanguage = languageCode.primaryLanguage.lowercase()
 
         // If the primary language is already 3 letters, it may already be ISO 639-3
@@ -119,8 +134,8 @@ object LanguageCodeUtil {
     }
 
     fun toLanguageCode(languageCodeIso3: LanguageCodeIso3): LanguageCode? {
-        val iso1 = ISO_639_3_TO_ISO_639_1[languageCodeIso3.value] ?: return null
-        return LanguageCode(iso1)
+        val bcp47 = ISO_639_3_TO_BCP47[languageCodeIso3.value] ?: return null
+        return LanguageCode(bcp47)
     }
 }
 
