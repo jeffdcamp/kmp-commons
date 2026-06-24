@@ -1,19 +1,27 @@
-@file:Suppress("unused")
-
 package org.dbtools.kmp.commons.analytics
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import okio.FileSystem
+import okio.Path
+import okio.SYSTEM
 
 class TestStrategy(
     private val logBlock: (message: String) -> Unit
 ) : AppAnalytics.Strategy {
+
+
     private var logLevel = AppAnalytics.LogLevel.NONE
     private var providerLoggingEnabled = false
 
     var eventScopeLevel = AppAnalytics.DEFAULT_EVENT_SCOPE_LEVEL
     var screenScopeLevel = AppAnalytics.DEFAULT_SCREEN_SCOPE_LEVEL
     var errorScopeLevel = AppAnalytics.DEFAULT_ERROR_SCOPE_LEVEL
+
+    // NOTE:  Setting this value will cause a write to json file on EVERY event (only use for debugging/QA)
+    val filesystem = FileSystem.SYSTEM
+    var logToJsonFile: Path? = null
 
     private val analyticsList = mutableListOf<Analytic>()
     private val json = Json {
@@ -29,30 +37,44 @@ class TestStrategy(
         this.providerLoggingEnabled = enableProviderLogging
     }
 
-    override fun logError(errorMessage: String, errorClass: String, scopeLevel: AppAnalytics.ScopeLevel) {
-        if (scopeLevel.ordinal > errorScopeLevel.ordinal) {
+    override fun logError(error: AnalyticError) {
+        if (error.scopeLevel.ordinal > errorScopeLevel.ordinal) {
             return
         }
 
-        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logError($errorMessage)")
+        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logError(${error.message})")
+        if (logToJsonFile != null) {
+            analyticsList.add(Analytic(AnalyticType.ERROR, error.message))
+            writeToJsonFile()
+        }
     }
 
-    override fun logEvent(eventId: String, parameterMap: Map<String, String>, scopeLevel: AppAnalytics.ScopeLevel) {
-        if (scopeLevel.ordinal > eventScopeLevel.ordinal) {
+    override fun logEvent(event: AnalyticEvent) {
+        if (event.scopeLevel.ordinal > eventScopeLevel.ordinal) {
             return
         }
 
-        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logEvent($eventId)")
-        consoleLogParameterMap(parameterMap)
+        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logEvent(${event.id})")
+        consoleLogParameterMap(event.params)
+
+        if (logToJsonFile != null) {
+            analyticsList.add(Analytic(AnalyticType.EVENT, event.id, event.params.orEmpty()))
+            writeToJsonFile()
+        }
     }
 
-    override fun logScreen(screenTitle: String, parameterMap: Map<String, String>, scopeLevel: AppAnalytics.ScopeLevel) {
-        if (scopeLevel.ordinal > screenScopeLevel.ordinal) {
+    override fun logScreen(screen: AnalyticScreen) {
+        if (screen.scopeLevel.ordinal > screenScopeLevel.ordinal) {
             return
         }
 
-        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logScreen($screenTitle)")
-        consoleLogParameterMap(parameterMap)
+        consoleLogMessage(AppAnalytics.LogLevel.EVENT, "logScreen(${screen.screenTitle})")
+        consoleLogParameterMap(screen.params)
+
+        if (logToJsonFile != null) {
+            analyticsList.add(Analytic(AnalyticType.SCREEN, screen.screenTitle, screen.params.orEmpty()))
+            writeToJsonFile()
+        }
     }
 
     private fun consoleLogMessage(level: AppAnalytics.LogLevel, message: String) {
@@ -61,12 +83,17 @@ class TestStrategy(
         }
     }
 
-    private fun consoleLogParameterMap(parameterMap: Map<String, String>) {
+    private fun consoleLogParameterMap(parameterMap: Map<String, String>?) {
         if (logLevel.ordinal >= AppAnalytics.LogLevel.VERBOSE.ordinal) {
-            parameterMap.keys.forEach {
+            parameterMap?.keys?.forEach {
                 consoleLogMessage(AppAnalytics.LogLevel.VERBOSE, "  $it:${parameterMap[it]}")
             }
         }
+    }
+
+    private fun writeToJsonFile() {
+        val logFile = logToJsonFile ?: return
+        filesystem.write(logFile) { writeUtf8(json.encodeToString(ListSerializer(Analytic.serializer()), analyticsList)) }
     }
 
     @Serializable
