@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-06-24
+
+### Added
+- Added AnalyticEvent, AnalyticScreen, and AnalyticError data classes
+- Added support for Chinese script variants (`zh-Hans`, `zh-Hant`) in language code conversions
+- Added optional JSON file logging support to TestStrategy using Okio
+
+### Changed
+- Refactored AppAnalytics and Strategy interfaces to use the new data classes for logEvent(), logScreen(), and logError()
+- Updated LanguageCodeUtil.toLanguageCodeIso3() to evaluate full BCP 47 language tags before falling back to the primary language
+- Renamed `ISO_639_3_TO_ISO_639_1` to `ISO_639_3_TO_BCP47` and updated reverse mapping logic to prefer more specific codes
+- Upgraded Gradle Wrapper to 9.6.0, Kotlin to 2.4.0, AGP to 9.2.1
+- Upgraded Android compileSdk to 37
+- Upgraded Ktor to 3.5.0
+- Upgraded kotlinx libraries (coroutines 1.11.0, serialization 1.11.0, datetime 0.8.0)
+- Upgraded coreKtx, detekt, vanniktechPlugin, and versionsPlugin
+
+### Fixed
+- Fixed property assignment in AppAnalytics.setLogLevel()
+
 ## [1.6.0] - 2026-04-08
 
 ### Added
