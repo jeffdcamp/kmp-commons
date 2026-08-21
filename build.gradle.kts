@@ -1,5 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
@@ -7,8 +6,6 @@ plugins {
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.vanniktechPublishing) apply false
 
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.download)
     alias(libs.plugins.versions) // ./gradlew dependencyUpdates -Drevision=release --refresh-dependencies
 }
 
@@ -38,40 +35,4 @@ fun isNonStable(version: String, includeStablePreRelease: Boolean): Boolean {
         stableKeyword || regex.matches(version)
     }
     return isStable.not()
-}
-
-allprojects {
-    apply(plugin = rootProject.libs.plugins.detekt.get().pluginId)
-    apply(plugin = rootProject.libs.plugins.download.get().pluginId)
-
-    // ===== Detekt =====
-    // download detekt config file
-    tasks.register<Download>("downloadDetektConfig") {
-        download {
-            onlyIf { !file("$projectDir/build/config/detektConfig.yml").exists() }
-            src("https://mobile-cdn.churchofjesuschrist.org/android/build/detekt/v2/detektConfig-latest.yml")
-            dest("$projectDir/build/config/detektConfig.yml")
-        }
-    }
-
-    // ./gradlew detekt
-    // ./gradlew detektDebug (support type checking)
-    detekt {
-        source.setFrom("src/main/kotlin", "src/commonMain/kotlin", "src/desktopMain/kotlin", "src/androidMain/kotlin")
-        allRules = true // fail build on any finding
-        buildUponDefaultConfig = true // preconfigure defaults
-        config.setFrom(files("$projectDir/build/config/detektConfig.yml")) // point to your custom config defining rules to run, overwriting default behavior
-        //    baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
-    }
-
-    tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
-        dependsOn("downloadDetektConfig")
-
-        // ignore ImageVector files
-        exclude("**/ui/compose/icons/**")
-
-        reports {
-            html.required.set(true) // observe findings in your browser with structure and code snippets
-        }
-    }
 }

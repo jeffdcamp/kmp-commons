@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-21
+
+### Added
+- Added Apple (iOS/macOS) klib cross-compilation support so all targets can be assembled/published from a Linux CI host (framework linking still requires macOS)
+- Added Gradle Daemon JVM toolchain configuration and the foojay-resolver-convention plugin
+- Enabled Kover coverage verification and host-side (JVM) unit tests for androidMain code
+
+### Changed
+- Migrated to the `android { }` Kotlin Multiplatform DSL and only declare Apple frameworks on macOS hosts
+- Moved Detekt and download-config setup into the module build script
+- Raised Android minSdk to 24
+- Switched the versions plugin id from `com.github.ben-manes` to `io.github.ben-manes`
+- Upgraded Gradle Wrapper to 9.7.0, AGP to 9.3.1, Kotlin to 2.4.10
+- Upgraded Ktor to 3.5.2, Okio to 3.18.1, Kover to 0.9.9, Detekt to 2.0.0-alpha.6, and versions plugin to 0.61.0
+
+### Fixed
+- Narrowed NetworkUtil host reachability check to catch `IOException` instead of all exceptions
+
 ## [1.7.0] - 2026-06-24
 
 ### Added

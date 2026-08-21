@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import java.io.IOException
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -32,7 +33,7 @@ actual class NetworkUtil {
                 socket.connect(InetSocketAddress(address, 53), 3000)
                 true
             }
-        } catch (e: Exception) {
+        } catch (ignore: IOException) {
             false
         }
     }
