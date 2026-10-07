@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-07
+
+### Added
+- `DirectDownloadRequest.maxAttempts` / `retryDelay` — `DirectDownloader` can now retry a failed download.
+  Defaults to `1` attempt (no retry), so existing callers are unchanged; opt in per request. A download is
+  not resumable, so every retry starts over from byte 0 — keep the count small and prefer a generous
+  `HttpTimeout.socketTimeoutMillis` for a connection that is merely slow. Only *transient* failures are
+  retried (no HTTP response, 5xx, 408, 429); a 404, 401/403 or 3xx is taken as the server's final answer,
+  and a local failure (`LOCAL_ERROR_CODE`) returns immediately. A `cancel()` during `retryDelay` stops the
+  retry without spending another request.
+- `DirectDownloadResult.NO_RESPONSE_CODE` — names the `code = -1` sentinel for "failed without an HTTP
+  response".
+- `DirectDownloadResult.LOCAL_ERROR_CODE` — `code = -2`, a local failure that a retry cannot change (an
+  unusable target path, a target directory that cannot be created, or an existing target file with
+  `overwriteExisting == false`). Never retried.
+- Unit tests for `DirectDownloader` retry behavior (`ktor-client-mock` + Okio `FakeFileSystem`)
+- `NetworkUtil.close()` releases platform resources (cancels the Apple `NWPathMonitor`, which previously leaked);
+  a no-op on Android, JVM and Linux. Call it when finished with a `NetworkUtil`.
+- JVM `NetworkUtil` connectivity probe host/port are configurable (`NetworkUtil(probeHost, probePort)`), for
+  networks that block the default `dns.google:53`.
+- Unit tests for `FileSystem.unzip()` (Zip Slip and symbolic link handling)
+
+### Security
+- `FileSystem.unzip()` (Okio): fixed Zip Slip (path traversal). An entry that resolves outside `targetDir`
+  (e.g. `../../shared_prefs/auth.xml`), or that would be written through a symbolic link, now fails the extraction.
+- Ktor error messages and logs (`executeSafely()`, `executeSafelyCached()`, `saveBodyToFile()`) no longer include
+  the URL query string or user info, which may contain tokens or PII.
+
+### Changed
+- Raised Android minSdk to 26
+- `NetworkUtil` (Apple): the `NWPathMonitor` callback uses a non-blocking `trySend` so it never blocks the main
+  dispatch queue.
+- `NetworkUtil` (JVM, Linux): `connectionInfoFlow()` probes off the collector's dispatcher (`Dispatchers.IO` on
+  JVM, `Dispatchers.Default` on Linux).
+- Upgraded Gradle Wrapper to 9.8.0, AGP to 9.4.1, Kotlin to 2.4.20
+- Upgraded Ktor to 3.6.0, Okio to 3.18.2, Kermit to 2.2.0, Kover to 0.9.11, AndroidX Core KTX to 1.19.1, and
+  versions plugin to 0.64.0
+
+### Fixed
+- `executeSafely()` / `executeSafelyCached()` rethrow `CancellationException` (and no longer catch `Error`s)
+  instead of returning a failure, so cancelled callers stay cancelled.
+- `Instant.nextDayOfWeek()`, `nextOrSameDayOfWeek()`, `previousDayOfWeek()` and `previousOrSameDayOfWeek()` are
+  no longer off by an hour across a DST change.
+- `NetworkUtil.isConnected()` (Linux): the probe `connect()` is now bounded by a 3 second timeout (it could hang
+  for the OS default on an offline/firewalled network).
+- Documentation: `ApiResponse` / `CacheApiResponse` `Failure.Error.Forbidden` is a 403 response (was mislabeled 401).
+- `DirectDownloader.inProgress` was never reset, so an instance could only ever perform one download. It is
+  now released when the download ends, and an instance can be reused.
+- `DirectDownloader.cancelRequested` was never reset either, so an instance that had been canceled once
+  reported "Download canceled" for every later download (after still spending the request). A `cancel()` now
+  applies only to the download it interrupted.
+- `cancel()` is now written through an atomic, like `inProgress`. It is called from a different thread than
+  the download loop that reads it, so as a plain `var` the flag could be missed or read stale.
+
 ## [1.8.0] - 2026-08-21
 
 ### Added

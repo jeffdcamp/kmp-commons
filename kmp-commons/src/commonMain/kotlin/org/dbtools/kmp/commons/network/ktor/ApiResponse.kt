@@ -20,8 +20,8 @@ sealed interface ApiResponse<T, E> {
         sealed interface Error<E> : Failure<E> {
             val message: String?
 
-            data class Client<E>(val details: E?, override val message: String? = details?.toString()) : Error<E> // 4xx but not 401 or 480
-            data class Forbidden(override val message: String?) : Error<Nothing> // 401
+            data class Client<E>(val details: E?, override val message: String? = details?.toString()) : Error<E> // 4xx but not 403 or 480
+            data class Forbidden(override val message: String?) : Error<Nothing> // 403
             data class NoToken(override val message: String?) : Error<Nothing> // 480
             data class Server(override val message: String?) : Error<Nothing> // 5xx
             data class Unknown(val status: HttpStatusCode, override val message: String? = status.toString()) : Error<Nothing> // Something else

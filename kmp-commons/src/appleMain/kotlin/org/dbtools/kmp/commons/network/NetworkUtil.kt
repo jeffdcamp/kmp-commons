@@ -5,7 +5,6 @@ package org.dbtools.kmp.commons.network
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
@@ -87,7 +86,9 @@ actual class NetworkUtil {
             val status = nw_path_get_status(path)
             val isConnected = status == nw_path_status_satisfied
             val isMetered = nw_path_is_expensive(path) || nw_path_is_constrained(path)
-            trySendBlocking(ConnectionInfo(isConnected, isMetered))
+            // Non-blocking send: the handler runs on the main dispatch queue, and the CONFLATED
+            // buffer always accepts (dropping any stale value), so we never block the queue.
+            trySend(ConnectionInfo(isConnected, isMetered))
         }
         nw_path_monitor_start(monitor)
 
@@ -95,4 +96,12 @@ actual class NetworkUtil {
             nw_path_monitor_cancel(monitor)
         }
     }.buffer(Channel.CONFLATED)
+
+    /**
+     * Cancels the long-lived path monitor started in [init]. Call this when the instance is no
+     * longer needed to avoid leaking the monitor and its dispatch queue handler.
+     */
+    actual fun close() {
+        nw_path_monitor_cancel(pathMonitor)
+    }
 }

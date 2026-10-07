@@ -39,10 +39,46 @@ fun FileSystem.unzip(sourceZipFile: Path, targetDir: Path, mustCreate: Boolean =
     val zipFilesystem = openZip(sourceZipFile)
     zipFilesystem.listRecursively("".toPath()).forEach { path ->
         val pathName = path.toString().removePrefix("/")
+        val outPath = targetDirFull.resolveInside(pathName)
         if (zipFilesystem.isDirectory(path)) {
-            createDirectories(targetDirFull / pathName)
+            requireResolvedWithin(outPath, targetDirFull, pathName)
+            createDirectories(outPath)
         } else {
-            zipFilesystem.copyFileToFileSystem(path, this, targetDirFull / pathName)
+            outPath.parent?.let { requireResolvedWithin(it, targetDirFull, pathName) }
+            // writing to a symbolic link would write to wherever it points (even if the link target does not exist yet)
+            require(metadataOrNull(outPath)?.symlinkTarget == null) { "Zip entry ($pathName) target is a symbolic link" }
+            zipFilesystem.copyFileToFileSystem(path, this, outPath)
         }
     }
+}
+
+/**
+ * Make sure [path] (with symbolic links resolved) is inside [dir]... a symbolic link already in the target directory (or in a parent of
+ * [path]) could otherwise redirect a write outside of [dir]. [path] may not exist yet, so its nearest existing ancestor is checked.
+ */
+private fun FileSystem.requireResolvedWithin(path: Path, dir: Path, entryName: String) {
+    var existing: Path? = path
+    while (existing != null && !exists(existing)) {
+        existing = existing.parent
+    }
+    require(existing != null && canonicalize(existing).isWithin(dir)) { "Zip entry ($entryName) resolves outside of the target directory ($dir)" }
+}
+
+/**
+ * Resolve [child] against this directory and make sure the result stays inside this directory (prevents "Zip Slip" path traversal
+ * where a zip entry such as "../../shared_prefs/auth.xml" would be written outside of the target directory)
+ */
+internal fun Path.resolveInside(child: String): Path {
+    val resolved = resolve(child, normalize = true)
+    require(resolved != this && resolved.isWithin(this)) { "Zip entry ($child) is outside of the target directory ($this)" }
+    return resolved
+}
+
+private fun Path.isWithin(dir: Path): Boolean {
+    var current: Path? = this
+    while (current != null) {
+        if (current == dir) return true
+        current = current.parent
+    }
+    return false
 }

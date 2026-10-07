@@ -1,6 +1,6 @@
 [versions]
-agp = "9.3.1" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
-kotlin = "2.4.10"
+agp = "9.4.1" # only use the latest supported by KMP (https://kotlinlang.org/docs/multiplatform-compatibility-guide.html)
+kotlin = "2.4.20"
 kotlinxCoroutines = "1.11.0"
 kotlinxSerialization = "1.11.0"
 kotlinxDateTime = "0.8.0"
@@ -8,17 +8,17 @@ kotlinxDateTime = "0.8.0"
 androidxDataStore = "1.2.1"
 
 android-compileSdk = "37"
-android-minSdk = "24"
+android-minSdk = "26"
 assertk = "0.28.1"
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 detekt = "2.0.0-alpha.6"
 downloadPlugin = "5.7.0"
-kermit = "2.1.0"
-kover = "0.9.9"
-ktor = "3.5.2"
-okio = "3.18.1"
+kermit = "2.2.0"
+kover = "0.9.11"
+ktor = "3.6.0"
+okio = "3.18.2"
 vanniktechPlugin = "0.37.0"
-versionsPlugin = "0.61.0"
+versionsPlugin = "0.64.0"
 
 [plugins]
 android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
@@ -51,5 +51,6 @@ ktor-client-resources = { group = "io.ktor", name = "ktor-client-resources", ver
 ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
 
 assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref = "assertk" }

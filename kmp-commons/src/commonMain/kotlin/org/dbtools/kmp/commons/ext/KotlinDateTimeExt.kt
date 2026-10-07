@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.dbtools.kmp.commons.ext
 
 import kotlinx.datetime.DatePeriod
@@ -18,7 +20,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.math.floor
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -55,7 +56,7 @@ fun Instant.nextDayOfWeek(
     val daysDiff = dayOfWeek(timeZone).isoDayNumber - dayOfWeek.isoDayNumber
 
     val daysToAdd = if (daysDiff >= 0) 7 - daysDiff else -daysDiff
-    return plus(daysToAdd.days)
+    return plus(daysToAdd, DateTimeUnit.DAY, timeZone)
 }
 
 /**
@@ -105,7 +106,7 @@ fun Instant.nextOrSameDayOfWeek(
     if (daysDiff == 0) return this
 
     val daysToAdd = if (daysDiff >= 0) 7 - daysDiff else -daysDiff
-    return plus(daysToAdd.days)
+    return plus(daysToAdd, DateTimeUnit.DAY, timeZone)
 }
 
 /**
@@ -155,7 +156,7 @@ fun Instant.previousDayOfWeek(
     val daysDiff = dayOfWeek.isoDayNumber - dayOfWeek(timeZone).isoDayNumber
 
     val daysToAdd = if (daysDiff >= 0) 7 - daysDiff else -daysDiff
-    return minus(daysToAdd.days)
+    return minus(daysToAdd, DateTimeUnit.DAY, timeZone)
 }
 
 fun DayOfWeek.previousDayOfWeekInstant(
@@ -205,7 +206,7 @@ fun Instant.previousOrSameDayOfWeek(
     if (daysDiff == 0) return this
 
     val daysToAdd = if (daysDiff >= 0) 7 - daysDiff else -daysDiff
-    return minus(daysToAdd.days)
+    return minus(daysToAdd, DateTimeUnit.DAY, timeZone)
 }
 
 /**

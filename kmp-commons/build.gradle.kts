@@ -127,6 +127,7 @@ kotlin {
                 implementation(libs.ktor.client.resources)
 
                 implementation(libs.okio)
+                implementation(libs.okio.fakefilesystem)
             }
         }
     }

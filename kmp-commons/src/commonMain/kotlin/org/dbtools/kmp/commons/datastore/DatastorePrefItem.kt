@@ -37,6 +37,8 @@ interface DatastorePrefItem<T: Any?> {
     }
 }
 
+// UnusedPrivateProperty is a false positive: the constructor vals below are used in the `flow` property initializer.
+@Suppress("UnusedPrivateProperty")
 class DefaultDatastorePrefItem<T: Any?>(
     private val dataStore: DataStore<Preferences>,
     private val preferenceKey: Preferences.Key<T>,
@@ -48,6 +50,8 @@ class DefaultDatastorePrefItem<T: Any?>(
     }
 }
 
+// UnusedPrivateProperty is a false positive: the constructor vals below are used in the `flow` property initializer / setValue.
+@Suppress("UnusedPrivateProperty")
 class DatastorePrefValueClass<PREF_T, VALUE_CLASS_T: Any?>(
     private val dataStore: DataStore<Preferences>,
     private val preferenceKey: Preferences.Key<PREF_T>,

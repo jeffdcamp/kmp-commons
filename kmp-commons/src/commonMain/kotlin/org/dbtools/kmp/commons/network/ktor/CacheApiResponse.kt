@@ -5,14 +5,43 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+/**
+ * A response wrapper for HTTP API calls that support conditional caching via ETag and Last-Modified headers.
+ *
+ * This is similar to [ApiResponse], but designed for endpoints that support HTTP conditional requests
+ * (If-None-Match / If-Modified-Since). It carries cache metadata ([Success.etag] and [Success.lastModified])
+ * alongside the response data so callers can store and reuse them in subsequent requests.
+ *
+ * A [Success] is returned for both:
+ * - **2xx responses**: [Success.data] contains the parsed response body, and [Success.etag]/[Success.lastModified]
+ *   contain the cache headers from the response for use in future conditional requests.
+ * - **304 Not Modified**: [Success.data] is `null` (the server confirmed the cached data is still valid),
+ *   and [Success.etag]/[Success.lastModified] are populated from the response. Callers should continue
+ *   using their previously cached data.
+ *
+ * A [Failure] is returned for error responses and exceptions:
+ * - [Failure.Error.Forbidden]: 403 responses
+ * - [Failure.Error.NoToken]: 480 responses
+ * - [Failure.Error.Client]: Other 4xx responses (excluding 403 and 480)
+ * - [Failure.Error.Server]: 5xx responses
+ * - [Failure.Error.Unknown]: Any other non-success HTTP status
+ * - [Failure.Exception]: An exception was thrown during the request (e.g. network failure)
+ *
+ * Use [HttpClient.executeSafelyCached][org.dbtools.kmp.commons.ext.executeSafelyCached] to execute an API call
+ * and receive a [CacheApiResponse]. Use [cacheHeaders][org.dbtools.kmp.commons.ext.cacheHeaders] to attach
+ * stored [etag][Success.etag] and [lastModified][Success.lastModified] values to subsequent requests.
+ *
+ * @param T The type of the successful response body.
+ * @param E The type of the error details for client errors.
+ */
 sealed interface CacheApiResponse<T, E> {
     data class Success<T>(val data: T?, val etag: String?, val lastModified: String?) : CacheApiResponse<T, Nothing>
     sealed interface Failure<E> : CacheApiResponse<Nothing, E> {
         sealed interface Error<E> : Failure<E> {
             val message: String?
 
-            data class Client<E>(val details: E?, override val message: String? = details?.toString()) : Error<E> // 4xx but not 401 or 480
-            data class Forbidden(override val message: String?) : Error<Nothing> // 401
+            data class Client<E>(val details: E?, override val message: String? = details?.toString()) : Error<E> // 4xx but not 403 or 480
+            data class Forbidden(override val message: String?) : Error<Nothing> // 403
             data class NoToken(override val message: String?) : Error<Nothing> // 480
             data class Server(override val message: String?) : Error<Nothing> // 5xx
             data class Unknown(val status: HttpStatusCode, override val message: String?) : Error<Nothing> // Something else

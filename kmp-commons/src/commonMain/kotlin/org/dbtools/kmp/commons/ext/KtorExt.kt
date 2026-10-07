@@ -11,13 +11,16 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import io.ktor.http.etag
+import io.ktor.http.hostWithPortIfSpecified
 import io.ktor.http.ifNoneMatch
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.readRemaining
 import io.ktor.utils.io.writeFully
+import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 import kotlinx.io.readByteArray
 import okio.BufferedSink
@@ -29,11 +32,10 @@ import okio.use
 import org.dbtools.kmp.commons.network.ktor.ApiResponse
 import org.dbtools.kmp.commons.network.ktor.CacheApiResponse
 
-@Suppress("kotlin:S6312") // Sonar issue with Coroutine scope on function ext
 suspend fun <T, E> HttpClient.executeSafely(
     apiCall: suspend HttpClient.() -> HttpResponse,
     mapClientError: suspend (HttpResponse) -> ApiResponse.Failure.Error.Client<E> = {
-        ApiResponse.Failure.Error.Client(null, "Error executing service call: ${it.request.method.value} ${it.request.url} (${it.status})")
+        ApiResponse.Failure.Error.Client(null, "Error executing service call: ${it.request.method.value} ${it.request.url.withoutQuery()} (${it.status})")
     },
     mapException: suspend (Throwable) -> ApiResponse.Failure.Exception = { ApiResponse.Failure.Exception(it) },
     mapSuccess: suspend (HttpResponse) -> T,
@@ -43,7 +45,7 @@ suspend fun <T, E> HttpClient.executeSafely(
         if (response.status.isSuccess()) {
             ApiResponse.Success(mapSuccess(response))
         } else {
-            val message = "Error executing service call: ${response.request.method.value} ${response.request.url} (${response.status})"
+            val message = "Error executing service call: ${response.request.method.value} ${response.request.url.withoutQuery()} (${response.status})"
             when (response.status) {
                 HttpStatusCode.Forbidden -> ApiResponse.Failure.Error.Forbidden(message)
                 HttpStatusCode.NoToken -> ApiResponse.Failure.Error.NoToken(message)
@@ -52,7 +54,10 @@ suspend fun <T, E> HttpClient.executeSafely(
                 else -> ApiResponse.Failure.Error.Unknown(response.status, message)
             }
         }
-    } catch (expected: Throwable) {
+    } catch (e: CancellationException) {
+        // never swallow cancellation (would break structured concurrency)
+        throw e
+    } catch (expected: Exception) {
         mapException(expected)
     }
 }
@@ -60,11 +65,15 @@ suspend fun <T, E> HttpClient.executeSafely(
 private val HttpStatusCode.Companion.NoToken: HttpStatusCode
     get() = HttpStatusCode(480, "No Token")
 
-@Suppress("kotlin:S6312") // Sonar issue with Coroutine scope on function ext
+/**
+ * Url without the query string or user info (query parameters may contain tokens or PII and should not end up in logs/error messages)
+ */
+internal fun Url.withoutQuery(): String = "${protocol.name}://$hostWithPortIfSpecified$encodedPath"
+
 suspend fun <T, E> HttpClient.executeSafelyCached(
     apiCall: suspend HttpClient.() -> HttpResponse,
     mapClientError: suspend (HttpResponse) -> CacheApiResponse.Failure.Error.Client<E> = {
-        CacheApiResponse.Failure.Error.Client(null, "Error executing service call: ${it.request.method.value} ${it.request.url} (${it.status})")
+        CacheApiResponse.Failure.Error.Client(null, "Error executing service call: ${it.request.method.value} ${it.request.url.withoutQuery()} (${it.status})")
     },
     mapException: suspend (Throwable) -> CacheApiResponse.Failure.Exception = { CacheApiResponse.Failure.Exception(it) },
     mapSuccess: suspend (HttpResponse) -> T,
@@ -76,7 +85,7 @@ suspend fun <T, E> HttpClient.executeSafelyCached(
         } else if (response.status.isSuccess()) {
             CacheApiResponse.Success(mapSuccess(response), response.etag(), response.headers[HttpHeaders.LastModified])
         } else {
-            val message = "Error executing service call: ${response.request.method.value} ${response.request.url} (${response.status})"
+            val message = "Error executing service call: ${response.request.method.value} ${response.request.url.withoutQuery()} (${response.status})"
             when (response.status) {
                 HttpStatusCode.Forbidden -> CacheApiResponse.Failure.Error.Forbidden(message)
                 HttpStatusCode.NoToken -> CacheApiResponse.Failure.Error.NoToken(message)
@@ -85,7 +94,10 @@ suspend fun <T, E> HttpClient.executeSafelyCached(
                 else -> CacheApiResponse.Failure.Error.Unknown(response.status, message)
             }
         }
-    } catch (expected: Throwable) {
+    } catch (e: CancellationException) {
+        // never swallow cancellation (would break structured concurrency)
+        throw e
+    } catch (expected: Exception) {
         mapException(expected)
     }
 }
@@ -99,7 +111,7 @@ suspend fun <T, E> HttpClient.executeSafelyCached(
  */
 @Suppress("kotlin:S6312")
 suspend fun HttpResponse.saveBodyToFile(fileSystem: FileSystem, outputFile: Path): Boolean {
-    Logger.d { "Saving response [${call.request.url}] to file [$outputFile]..." }
+    Logger.d { "Saving response [${call.request.url.withoutQuery()}] to file [$outputFile]..." }
     var success = false
     try {
         // if the target file already exists, remove it.

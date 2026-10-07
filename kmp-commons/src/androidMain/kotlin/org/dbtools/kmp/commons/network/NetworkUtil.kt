@@ -6,8 +6,6 @@ import android.Manifest.permission.ACCESS_NETWORK_STATE
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.os.Build
 import androidx.annotation.RequiresPermission
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
@@ -56,6 +54,9 @@ actual class NetworkUtil(private val connectivityManager: ConnectivityManager) {
     @RequiresPermission(ACCESS_NETWORK_STATE)
     actual fun isActiveNetworkMetered() = connectivityManager.isActiveNetworkMetered
 
+    // allNetworks is deprecated (API 31) in favor of tracking networks with a NetworkCallback, but this is a synchronous one-shot check
+    // (a callback cannot answer synchronously) and allNetworks still returns the correct networks.
+    @Suppress("DEPRECATION")
     @RequiresPermission(ACCESS_NETWORK_STATE)
     private fun hasInternetCapabilityInAnyNetwork(): Boolean {
         return connectivityManager.allNetworks.any { network ->
@@ -66,6 +67,9 @@ actual class NetworkUtil(private val connectivityManager: ConnectivityManager) {
         }
     }
 
+    // allNetworks is deprecated (API 31) in favor of tracking networks with a NetworkCallback, but this is a synchronous one-shot check
+    // (a callback cannot answer synchronously) and allNetworks still returns the correct networks.
+    @Suppress("DEPRECATION")
     @RequiresPermission(ACCESS_NETWORK_STATE)
     private fun hasInternetCapableWiFiInAnyNetwork(): Boolean {
         return connectivityManager.allNetworks.any { network ->
@@ -82,6 +86,9 @@ actual class NetworkUtil(private val connectivityManager: ConnectivityManager) {
         return activeNetworkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
     }
 
+    // allNetworks is deprecated (API 31) in favor of tracking networks with a NetworkCallback, but this is a synchronous one-shot snapshot
+    // (a callback cannot answer synchronously) and allNetworks still returns the correct networks.
+    @Suppress("DEPRECATION")
     @RequiresPermission(ACCESS_NETWORK_STATE)
     fun getAllNetworkInfo(allowMobileNetwork: Boolean = true): String {
         val activeNetwork = connectivityManager.activeNetwork ?: return "No Active Network"
@@ -116,16 +123,11 @@ actual class NetworkUtil(private val connectivityManager: ConnectivityManager) {
     }
 
     /**
-     * Registers a [ConnectivityManager.NetworkCallback] that can react to network connectivity changes. NOTE:
-     * this is only supported on devices running API 21 or higher.
+     * Registers a [ConnectivityManager.NetworkCallback] (for the default network) that can react to network connectivity changes.
      */
     @RequiresPermission(ACCESS_NETWORK_STATE)
     fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager.registerDefaultNetworkCallback(networkCallback)
-        } else {
-            connectivityManager.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
-        }
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
     }
 
     /**
@@ -154,4 +156,7 @@ actual class NetworkUtil(private val connectivityManager: ConnectivityManager) {
         registerNetworkCallback(callback)
         awaitClose { unregisterNetworkCallback(callback) }
     }.buffer(Channel.CONFLATED)
+
+    // No long-lived resources to release; connectivity is read on demand from the ConnectivityManager.
+    actual fun close() = Unit
 }

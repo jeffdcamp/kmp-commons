@@ -32,4 +32,11 @@ expect class NetworkUtil {
      * Returns a Flow that emits ConnectionInfo whenever network connectivity changes.
      */
     fun connectionInfoFlow(): Flow<ConnectionInfo>
+
+    /**
+     * Releases any platform resources held by this instance (e.g. the Apple NWPathMonitor).
+     * Call this when the [NetworkUtil] is no longer needed. This is a no-op on platforms that
+     * hold no long-lived resources (Android, JVM, Linux).
+     */
+    fun close()
 }

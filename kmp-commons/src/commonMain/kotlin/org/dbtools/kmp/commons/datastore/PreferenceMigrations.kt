@@ -54,11 +54,7 @@ class PreferenceMigrations(
             val fromVersion = it.fromVersion
             val toVersion = it.toVersion
 
-            var targetMap = migrationTree[fromVersion]
-            if (targetMap == null) {
-                targetMap = mutableMapOf()
-                migrationTree[fromVersion] = targetMap
-            }
+            val targetMap = migrationTree.getOrPut(fromVersion) { mutableMapOf() }
 
             val existing = targetMap[toVersion]
             if (existing != null) {
